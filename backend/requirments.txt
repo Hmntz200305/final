@@ -1,0 +1,9 @@
+Flask
+flask_cors
+flask_restful
+flask_mail
+mysql-connector-python
+PyJWT
+pandas
+flask_sslify
+qrcode

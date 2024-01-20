@@ -1,0 +1,22 @@
+.qr-reader-container {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    position: relative;
+    border: 2px solid #25d366;
+    border-radius: 8px;
+  }
+  
+  .scan-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid #25d366;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(37, 211, 102, 0.3);
+  }
