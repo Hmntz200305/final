@@ -74,10 +74,10 @@ const Dashboard = () => {
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Welcome, Dashboard page :)</h2>
+                    <h2 className='text-white'>Welcome, Dashboard page tehe :)</h2>
                 </div>
                 <div className='bg-white p-5'>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
                         <Link to='/listasset'>
                             <Popover
                                 open={popover1}

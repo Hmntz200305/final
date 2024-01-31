@@ -41,6 +41,8 @@
     "styled-components": "^6.1.1",
     "web-vitals": "^2.1.4",
     "webrtc-adapter": "^8.2.3"
+
+    
   },
   "scripts": {
     "start": "HTTPS=true SSL_CRT_FILE=/home/my-app/ssl/lmd.crt SSL_KEY_FILE=/home/my-app/ssl/lmd.key react-scripts start",

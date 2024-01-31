@@ -30,8 +30,7 @@ import ScanCheck from './pages/ScanCheck';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Bounce,  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Card, Typography, List, ListItem, ListItemPrefix, ListItemSuffix, Chip, Accordion, AccordionHeader, AccordionBody, Drawer, Avatar, Popover, PopoverContent,PopoverHandler, Button
-} from "@material-tailwind/react";
+import { Card, Typography, List, ListItem, ListItemPrefix, ListItemSuffix, Chip, Accordion, AccordionHeader, AccordionBody, Drawer, Avatar, Popover, PopoverContent,PopoverHandler, Badge } from "@material-tailwind/react";
 
 const Home = () =>  {
   const { loggedIn, logout, username, Role, Roles, email, Notification, setNotification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar,  } = useAuth();
@@ -325,7 +324,7 @@ const Home = () =>  {
                   </button>
                 </div>
             </div>
-            <List className='px-6'>
+            <List className='px-6 overflow-y-auto mb-20'>
               {/* DASHBOARD */}
               <Link to='/'>
                 <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
@@ -403,11 +402,16 @@ const Home = () =>  {
                             <FontAwesomeIcon icon={faPaperPlane} />
                           </ListItemPrefix>
                           Submitted
+                          <ListItemSuffix>
+                            <Badge>
+                              <Chip value="51" size="sm" variant="white" color="gray-800" className="rounded-full" />
+                            </Badge>
+                          </ListItemSuffix>
                         </ListItem>
                       </Link>
                     ) : null}
                     {Role === 2 || Role === 1 ? (
-                      <Link to='/qrgen'>
+                      <Link to='/QRGen'>
                         <ListItem className='px-4 text-white hover:bg-[#374151] hover:text-white hover:rounded-none focus:rounded-none focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>
                           <ListItemPrefix className='mr-3 w-6 h-6'>
                             <FontAwesomeIcon icon={faQrcode} />
@@ -593,7 +597,7 @@ const Home = () =>  {
                   </button>
               </div>
             </div>
-            <List className='px-6 overflow-y-auto'>
+            <List className='px-6 overflow-y-auto mb-20'>
               {/* DASHBOARD */}
               <Link to='/'>
                 <ListItem className='px-4 text-white hover:bg-[#323b49] hover:text-white focus:bg-[#323b49] focus:text-white active:bg-gray-600 active:text-white'>

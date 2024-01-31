@@ -416,7 +416,7 @@ const History = () => {
                     className='bg-gray-800 p-1 rounded-lg'
                     onClick={() => openMoreDetailHandler(row.original)}
                     >
-                    <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
+                        <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
                     </button>
                 </div>
               ),

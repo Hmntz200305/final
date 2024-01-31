@@ -1,14 +1,56 @@
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component';
 import 'react-data-table-component-extensions/dist/index.css';
-import { faCheck, faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleInfo, faEllipsis, faXmark, } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
-import { Button, Typography } from '@material-tailwind/react'
+import { Button, Typography, Tabs, TabsHeader, TabsBody, Tab, TabPanel, Badge } from '@material-tailwind/react'
 import Modal from 'react-modal';
+
 Modal.setAppElement('#root');
 
 const Submitted = () => {
+
+    const LeaseContent = () => {
+
+      return (
+        <>
+          <div className='p-2 bg-white z-0 static'>
+            <DataTable 
+              className='static z-0'
+              columns={columnLease}
+              data={SubmitedList}
+              noHeader
+              defaultSortField='no'
+              defaultSortAsc={false}
+              pagination
+              highlightOnHover
+            />
+          </div>
+        </>
+      )
+    }
+
+    const ReturnContent = () => {
+
+      return (
+        <>
+          <div className='p-2 bg-white z-0 static'>
+            <DataTable 
+              className='z-0 static'
+              columns={columnReturn}
+              data={SubmitedList}
+              noHeader
+              defaultSortField='no'
+              defaultSortAsc={false}
+              pagination
+              highlightOnHover
+            />
+          </div>
+        </>
+      )
+    }
+
     const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar } = useAuth();
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTicketSenderName, setSelectedTicketSenderName] = useState(null);
@@ -143,7 +185,7 @@ const Submitted = () => {
           setNotification(data.message);
           setNotificationStatus(true);
           setNotificationInfo(data.Status);
-          setShowApprove(false);
+          setApproveLease(false);
           refreshSubmitedList();
           setSelectedTicketId(null);
           setSelectedTicketingAdmin(null);
@@ -179,7 +221,7 @@ const Submitted = () => {
           setNotification(data.message);
           setNotificationStatus(true);
           setNotificationInfo(data.Status);
-          setShowDecline(false);
+          setDeclineLease(false);
           refreshSubmitedList();
           setSelectedTicketId(null);
           setSelectedTicketingAdmin(null);
@@ -195,7 +237,7 @@ const Submitted = () => {
         setIsLoading(false);
       }
     };
-
+    
     const moreLease = [
       {
           name: 'ID Asset',
@@ -293,8 +335,8 @@ const Submitted = () => {
               name: 'More Detail',
               cell: (row) => (
                   <div className='text-white flex items-center justify-center cursor-pointer'>
-                    <button className='bg-gray-800 p-1 rounded-lg' onClick={() => showMoreDetailLease(row)}>
-                      <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
+                    <button className='bg-gray-800 py-1 px-4 rounded rounded-full' onClick={() => showMoreDetailLease(row)}>
+                      <FontAwesomeIcon icon={faEllipsis} size='xl'/>
                     </button>
                   </div>
                 ),
@@ -398,20 +440,69 @@ const Submitted = () => {
               name: 'More Detail',
               cell: (row) => (
                   <div className='text-white flex items-center justify-center cursor-pointer'>
-                    <button className='bg-gray-800 p-1 rounded-lg' onClick={() => showMoreDetailReturn(row)}>
-                      <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
+                    <button className='bg-gray-800 py-1 px-4 rounded rounded-full' onClick={() => showMoreDetailReturn(row)}>
+                      <FontAwesomeIcon icon={faEllipsis} size='xl'/>
                     </button>
                   </div>
                 ),
               },
       ]
 
+      const [activeTab, setActiveTab] = useState("lease");
+      const data = [
+      {
+          label: "Lease",
+          value: "lease",
+          content: <LeaseContent />,
+      },
+      {
+          label: "Return",
+          value: "return",
+          content: <ReturnContent />,
+      },
+    ];
+
     return (
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di Submitted page xixixi :)</h2>
+                    <h2 className='text-white'>Selamat datang di Submitted page :)</h2>
                 </div>
+            </div>
+
+            <div className='p-2'>
+              <div className='bg-white rounded'>
+                  <div className='flex justify-center'>
+                      <h1 className="text-2xl font-semibold mt-6">Select Action</h1>
+                  </div>
+                  <Tabs value={activeTab} className='p-2'>
+                      <TabsHeader className="rounded-none p-0 border-b border-blue-gray-50 mt-4 bg-white"
+                          indicatorProps={{
+                              className: "bg-transparent border-b-2 border-gray-900 shadow-none rounded-none",
+                          }}
+                      >
+                          {data.map(({ label, value }) => (
+                              <Tab
+                                key={value}
+                                value={value}
+                                onClick={() => setActiveTab(value)}
+                                className={activeTab === value ? "text-gray-800" : "hover:text-gray-500"}
+                              >
+                                <Badge>
+                                  {label}
+                                </Badge>
+                              </Tab>
+                          ))}
+                      </TabsHeader>
+                      <TabsBody>
+                          {data.map(({ value, content }) => (
+                              <TabPanel key={value} value={value}>
+                                {content}
+                              </TabPanel>
+                          ))}
+                      </TabsBody>
+                  </Tabs>
+              </div>
             </div>
             
             {/* APPROVAL LEASE */}
@@ -420,20 +511,20 @@ const Submitted = () => {
                     isOpen={approveLease}
                     onRequestClose={closeApproveLease}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2'>
                         <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
                             <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Approval Lease)</h1>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
                                 <p>Apakah anda yakin <u>Ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
                             </div>
                             <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveLease}>Close</Button>
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveLease}>Close</Button>
                                 <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
                                   onClick={() => handleApprove(token)}
                                   disabled={isLoading}
                                 >
@@ -449,20 +540,20 @@ const Submitted = () => {
                     isOpen={approveLease}
                     onRequestClose={closeApproveLease}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className='modal-content bg-transparent p-4 w-screen'
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2'>
                         <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
                             <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Approval Lease)</h1>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
                                 <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
                             </div>
                             <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveLease}>Close</Button>
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveLease}>Close</Button>
                                 <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
                                   onClick={() => handleDecline(token)}
                                   disabled={isLoading}
                                 >
@@ -480,20 +571,20 @@ const Submitted = () => {
                     isOpen={declineLease}
                     onRequestClose={closeDeclineLease}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                    className={`modal-content bg-transparent p-4 z-[8888] w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2'>
                         <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
                             <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Decline Lease)</h1>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
                                 <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
                             </div>
                             <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineLease}>Close</Button>
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineLease}>Close</Button>
                                 <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
                                   onClick={() => handleDecline(token)}
                                   disabled={isLoading}
                                 >
@@ -509,140 +600,20 @@ const Submitted = () => {
                     isOpen={declineLease}
                     onRequestClose={closeDeclineLease}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className='modal-content bg-transparent p-4 w-screen'
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2'>
                         <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
                             <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Decline Lease)</h1>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
                                 <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
                             </div>
                             <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineLease}>Close</Button>
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineLease}>Close</Button>
                                 <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-
-            {/* APPROVAL RETURN */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={approveReturn}
-                    onRequestClose={closeApproveReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Approval Return)</h1>
-                                <p>Apakah anda yakin <u>Ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
-                                <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleApprove(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Approve'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={approveReturn}
-                    onRequestClose={closeApproveReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Approval Return)</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
-                                <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-
-            {/* DECLINE RETURN */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={declineReturn}
-                    onRequestClose={closeDeclineReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Decline Return)</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
-                                <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={declineReturn}
-                    onRequestClose={closeDeclineReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Decline Return)</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
-                                <Button 
-                                  className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
                                   onClick={() => handleDecline(token)}
                                   disabled={isLoading}
                                 >
@@ -660,7 +631,7 @@ const Submitted = () => {
                     isOpen={showMoreAssetLease}
                     onRequestClose={closeMoreDetailLease}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                     shouldCloseOnOverlayClick={false}
                     >
@@ -671,7 +642,7 @@ const Submitted = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <Button onClick={closeMoreDetailLease} className=" mt-4">
+                        <Button onClick={closeMoreDetailLease} className="bg-red-500 hover:bg-red-600 mt-4">
                             Close
                         </Button>
                     </div>
@@ -682,7 +653,7 @@ const Submitted = () => {
                     isOpen={showMoreAssetLease}
                     onRequestClose={closeMoreDetailLease}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className='modal-content bg-transparent p-4 w-screen'
                     shouldCloseOnOverlayClick={false}
                     >
@@ -693,9 +664,129 @@ const Submitted = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <Button onClick={closeMoreDetailLease} className=" mt-4">
+                        <Button onClick={closeMoreDetailLease} className="bg-red-500 hover:bg-red-600 mt-4">
                             Close
                         </Button>
+                    </div>
+                </Modal>
+            )}
+
+            {/* APPROVAL RETURN */}
+            {isDesktopView && (
+                <Modal
+                    isOpen={approveReturn}
+                    onRequestClose={closeApproveReturn}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500hamam bg-opacity-75 flex items-center justify-center z-[1000]"
+                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2'>
+                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                            <div className='flex flex-col text-center mb-2'>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
+                                <p>Apakah anda yakin <u>Ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
+                            </div>
+                            <div className="flex space-x-4 mt-5">
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
+                                <Button 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
+                                  onClick={() => handleApprove(token)}
+                                  disabled={isLoading}
+                                >
+                                    {isLoading ? 'Proses...' : 'Approve'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            {!isDesktopView && (
+                <Modal
+                    isOpen={approveReturn}
+                    onRequestClose={closeApproveReturn}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                    className='modal-content bg-transparent p-4 w-screen'
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2'>
+                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                            <div className='flex flex-col text-center mb-2'>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
+                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
+                            </div>
+                            <div className="flex space-x-4 mt-5">
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
+                                <Button 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
+                                  onClick={() => handleDecline(token)}
+                                  disabled={isLoading}
+                                >
+                                    {isLoading ? 'Proses...' : 'Decline'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
+            {/* DECLINE RETURN */}
+            {isDesktopView && (
+                <Modal
+                    isOpen={declineReturn}
+                    onRequestClose={closeDeclineReturn}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2'>
+                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                            <div className='flex flex-col text-center mb-2'>
+                                <h1 className="text-2xl font-semibold">Select Action</h1>
+                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
+                            </div>
+                            <div className="flex space-x-4 mt-5">
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
+                                <Button 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
+                                  onClick={() => handleDecline(token)}
+                                  disabled={isLoading}
+                                >
+                                    {isLoading ? 'Proses...' : 'Decline'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            {!isDesktopView && (
+                <Modal
+                    isOpen={declineReturn}
+                    onRequestClose={closeDeclineReturn}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                    className='modal-content bg-transparent p-4 w-screen'
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2'>
+                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                            <div className='flex flex-col text-center mb-2'>
+                                <h1 className="text-2xl font-semibold">Select Action (Decline Return)</h1>
+                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
+                            </div>
+                            <div className="flex space-x-4 mt-5">
+                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
+                                <Button 
+                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
+                                  onClick={() => handleDecline(token)}
+                                  disabled={isLoading}
+                                >
+                                    {isLoading ? 'Proses...' : 'Decline'}
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </Modal>
             )}
@@ -706,7 +797,7 @@ const Submitted = () => {
                     isOpen={showMoreAssetReturn}
                     onRequestClose={closeMoreDetailReturn}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                     shouldCloseOnOverlayClick={false}
                     >
@@ -717,7 +808,7 @@ const Submitted = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <Button onClick={closeMoreDetailReturn} className=" mt-4">
+                        <Button onClick={closeMoreDetailReturn} className="bg-red-500 hover:bg-red-600 mt-4">
                             Close
                         </Button>
                     </div>
@@ -725,10 +816,10 @@ const Submitted = () => {
             )}
             {!isDesktopView && (
                 <Modal
-                    isOpen={showMoreAssetLease}
+                    isOpen={showMoreAssetReturn}
                     onRequestClose={closeMoreDetailReturn}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
                     className='modal-content bg-transparent p-4 w-screen'
                     shouldCloseOnOverlayClick={false}
                     >
@@ -739,44 +830,12 @@ const Submitted = () => {
                                 data={selectedAssetDetails}
                                 highlightOnHover
                             />
-                        <Button onClick={closeMoreDetailReturn} className=" mt-4">
+                        <Button onClick={closeMoreDetailReturn} className="bg-red-500 hover:bg-red-600 mt-4">
                             Close
                         </Button>
                     </div>
                 </Modal>
             )}
-
-            <div className='space-y-4'>
-              <div className='p-2 bg-white'>
-                <Typography variant='h6'>
-                  Approval Lease
-                </Typography>
-                  <DataTable 
-                  columns={columnLease}
-                  data={SubmitedList}
-                  noHeader
-                  defaultSortField='no'
-                  defaultSortAsc={false}
-                  pagination
-                  highlightOnHover
-                  />
-              </div>
-
-              <div className='p-2 bg-white'>
-                <Typography variant='h6'>
-                  Approval Return
-                </Typography>
-                  <DataTable 
-                  columns={columnReturn}
-                  data={SubmitedList}
-                  noHeader
-                  defaultSortField='no'
-                  defaultSortAsc={false}
-                  pagination
-                  highlightOnHover
-                  />
-              </div>
-            </div>
         </>
     )
 }

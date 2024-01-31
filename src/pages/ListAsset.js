@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import 'react-data-table-component-extensions/dist/index.css';
 import {  faFileCsv, faPenToSquare, faTrash, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,8 +9,7 @@ import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Modal from 'react-modal';
-import { Tabs, TabsHeader, TabsBody, Tab, TabPanel, } from "@material-tailwind/react";
-import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
+import { Tabs, TabsHeader, TabsBody, Tab, TabPanel, Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
 
 Modal.setAppElement('#root');
 
@@ -135,17 +134,8 @@ const ListAsset = () => {
   }
 
   const ImportContent = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [selectedFileName, setSelectedFileName] = useState('');
     const [uploadedFile, setUploadedFile] = useState(null);
-
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      console.log('Selected File:', file);
-      console.log('File Size:', file.size);
-      setSelectedFile(file);
-      setSelectedFileName(file ? file.name : '');
-    };
+    const [selectedFile, setSelectedFile] = useState(null);
 
     const handleFileUpload = async () => {
       if (!selectedFile) {
@@ -180,54 +170,69 @@ const ListAsset = () => {
         console.error('Error:', error);
       }
     };
+      
+      const handleDownload = () => {
+        const fileURL = 'https://asset.lintasmediadanawa.com:8443/static/template/TemplateImport.xlsx'; // Gantilah dengan URL file yang sesuai
+        const a = document.createElement('a');
+        a.href = fileURL;
+        a.download = 'TemplateImport.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+      
+      const handleUpload = (acceptedFiles) => {
+        const file = acceptedFiles[0];
+        setUploadedFile(file);
+      };
 
-    const handleUpload = (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      setUploadedFile(file);
-    };
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-      onDrop: handleUpload,
-      multiple: false, // Hanya izinkan unggah satu file
-      accept: '.csv, .xlsx',
-    });
+      const onDrop = useCallback(acceptedFiles => {
+        const allowedFormats = ['.csv', '.xlsx'];
+        const isFormatValid = acceptedFiles.every(file => allowedFormats.includes(file.name.slice(file.name.lastIndexOf('.'))));
 
+        const maxFileSize = 10 * 1024 * 1024;
+        const isSizeValid = acceptedFiles.every(file => file.size <= maxFileSize);
 
-    const handleDownload = () => {
-      const fileURL = 'https://asset.lintasmediadanawa.com:8443/static/template/MyReport.csv'; // Gantilah dengan URL file yang sesuai
-      const a = document.createElement('a');
-      a.href = fileURL;
-      a.download = 'MyReport.csv'; // Gantilah dengan nama file yang sesuai
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    };
+        if (isFormatValid && isSizeValid) {
+          setSelectedFile(acceptedFiles[0]?.name);
+          handleUpload(acceptedFiles);
+        } else {
+          alert('Invalid file format or size. Please select a valid file.');
+        }
+      }, []);
+
+      const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
+
 
     return (
-      <div className='p-2 flex'>
-          <div className='flex flex-col gap-1 flex-grow break-all'>
-            <p className='mb-4'>Silahkan download terlebih dahulu template untuk importnya:
-              <span className='font-semibold underline cursor-pointer ml-2' onClick={handleDownload}>Download</span>
-            </p>
-            <div className="flex items-center">
-              <label htmlFor="dropzone-file" {...getRootProps()} className="flex flex-col flex-grow items-center justify-center h-36 w-full border-2 border-gray-800 border-dashed rounded-lg cursor-pointer">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6 px-2">
-                  <svg className="w-8 h-8 mb-4 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                  </svg>
-                  <p className="mb-2 text-sm text-gray-800"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                  <p className="text-xs text-gray-800">Only CSV/XLSX (MAX. 10MB)</p>
-                  <p className='text-gray text-sm'>Selected File: <span className='underline'>{selectedFileName}</span></p>
-                </div>
-                <input className='hidden' {...getInputProps()} id="dropzone-file" type="file" accept=".csv, .xlsx" onChange={handleFileChange} />
-              </label>
+      <>
+        <div className='flex flex-col p-2'>
+          <p className='mb-4'>Silahkan download terlebih dahulu template untuk importnya:
+            <span className='font-semibold underline cursor-pointer ml-2' onClick={handleDownload}>Download</span>
+          </p>
+          <div className='flex items-center'>
+            <div {...getRootProps()} className='flex flex-col flex-grow items-center justify-center h-36 w-full border-2 border-gray-800 border-dashed rounded-lg cursor-pointer'>
+              <svg className="w-8 h-8 mb-4 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+              </svg>
+              <input {...getInputProps()} />
+              {
+                isDragActive ?
+                  <p>Drop the files here ...</p> 
+                  :
+                  <p><span className='font-semibold'>Click to upload</span> or drag and drop</p>
+              }
+              <p className="text-xs text-gray-800 mt-2">Only CSV/XLSX (MAX. 10MB)</p>
+              <p className='text-gray text-sm'>Selected File: <span className='underline'>{selectedFile}</span></p>
             </div>
-            <Button className='' onClick={handleFileUpload}>Upload</Button>
           </div>
-      </div>
+          <Button className='mt-2' onClick={handleFileUpload}>Upload</Button>
+        </div>
+      </>
     )
   }
 
-  const { token, Role, DataListAsset, refreshAssetData, refreshStatusList, StatusOptions, LocationOptions, refreshLocationList, refreshCategoryList, CategoryOptions, setNotification, setNotificationInfo, setNotificationStatus, openSidebar, setOpenSidebar, ListCategory, refreshListCategory  } = useAuth();
+  const { token, Role, DataListAsset, refreshAssetData, refreshStatusList, StatusOptions, LocationOptions, refreshLocationList, refreshCategoryList, CategoryOptions, setNotification, setNotificationInfo, setNotificationStatus, openSidebar, setOpenSidebar, ListCategory, refreshListCategory, ListStatus, refreshListStatus, ListLocation, refreshListLocation  } = useAuth();
   const [selectedAssetId, setSelectedAssetId] = useState(null);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [fileInput, setFileInput] = useState(null);
@@ -318,6 +323,8 @@ const ListAsset = () => {
     refreshLocationList();
     refreshCategoryList();
     refreshListCategory();
+    refreshListStatus();
+    refreshListLocation();
     // eslint-disable-next-line
   }, []);
 
@@ -406,7 +413,7 @@ const ListAsset = () => {
     }
   };
 
-  const [activeTab, setActiveTab] = React.useState("export");
+  const [activeTab, setActiveTab] = useState("export");
     const data = [
     {
         label: "Export",
@@ -467,10 +474,14 @@ const ListAsset = () => {
     columnHelper.accessor('status', {
       header: 'Status',
       size: 220,
+      filterVariant: 'select',
+      filterSelectOptions: ListStatus,
     }),
     columnHelper.accessor('location', {
       header: 'Location',
       size: 220,
+      filterVariant: 'select',
+      filterSelectOptions: ListLocation,
     }),
     columnHelper.accessor('category', {
       header: 'Category',
@@ -952,7 +963,6 @@ const ListAsset = () => {
           </div>
         </Modal>
       )}
-
       {!isDesktopView && (
         <Modal 
           isOpen={modalQr}

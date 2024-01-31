@@ -363,8 +363,8 @@ const AddAsset = () => {
                             />
                         </div>
                         <div className="flex justify-center space-x-4 mt-5 mb-2">
-                            <button className="" onClick={closeModalLocation}>Cancel</button>
-                            <button className="" onClick={() => handleNewLocation(token)}>Tambah</button>
+                            <Button className="" onClick={closeModalLocation}>Cancel</Button>
+                            <Button className="" onClick={() => handleNewLocation(token)}>Tambah</Button>
                         </div>
                     </div>
                 </div>

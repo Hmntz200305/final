@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from 'react'
 import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
-import { faLock, faUser, faUserShield } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope, faEye, faEyeSlash} from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';

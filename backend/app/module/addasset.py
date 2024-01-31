@@ -163,7 +163,7 @@ class AddStatus(Resource):
                 if fetch == 2:
                     data = request.get_json()
                     newStatus = data.get('newStatus')
-                    lmd.execute("SELECT status FROM status WHERE id = %s", (newStatus,))
+                    lmd.execute("SELECT status FROM status WHERE status = %s", (newStatus,))
                     existing_asset = lmd.fetchone()
                     if not newStatus:
                         return {'message': 'The form must be filled in', "Status": "warning"}, 401
@@ -200,7 +200,7 @@ class AddLocation(Resource):
                     newLocation = data.get('newLocation')
                     if not newLocation:
                         return {'message': 'The form must be filled in', "Status": "warning"}, 401
-                    lmd.execute("SELECT lokasi FROM location WHERE id = %s", (newLocation,))
+                    lmd.execute("SELECT lokasi FROM location WHERE lokasi = %s", (newLocation,))
                     existing_asset = lmd.fetchone()
                     if existing_asset:
                         return {"message": "Status exist", "Status": "error"}
@@ -234,10 +234,10 @@ class AddCategory(Resource):
                     newCategory = data.get('newCategory')
                     if not newCategory:
                         return {'message': 'The form must be filled in', "Status": "warning"}, 401
-                    lmd.execute("SELECT kategori FROM category WHERE id = %s", (newCategory,))
+                    lmd.execute("SELECT kategori FROM category WHERE kategori = %s", (newCategory,))
                     existing_asset = lmd.fetchone()
                     if existing_asset:
-                        return {"message": "Status exist"}
+                        return {"message": "Status exist", "Status": "error"}
                     else:
                         lmd.execute("INSERT INTO category (kategori) VALUES (%s)", (newCategory,))
                         db.commit()

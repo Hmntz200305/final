@@ -207,7 +207,7 @@ class ListAssetExcept(Resource):
     
     
 class ListCategory(Resource):
-    # @check_whitelist
+    @check_whitelist
     def get(self):
         db, lmd = get_db_connection()
         lmd.execute("SELECT kategori FROM category")
@@ -219,3 +219,31 @@ class ListCategory(Resource):
         } for item in category_data]
 
         return jsonify(category_list)
+    
+class ListStatus(Resource):
+    @check_whitelist
+    def get(self):
+        db, lmd = get_db_connection()
+        lmd.execute("SELECT status FROM status")
+        status_data = lmd.fetchall()
+        status_list = []
+        lmd.close()
+        formatted_status_data = [{
+            status_list.append(item[0])
+        } for item in status_data]
+
+        return jsonify(status_list)
+    
+class ListLocation(Resource):
+    @check_whitelist
+    def get(self):
+        db, lmd = get_db_connection()
+        lmd.execute("SELECT lokasi FROM location")
+        location_data = lmd.fetchall()
+        location_list = []
+        lmd.close()
+        formatted_location_data = [{
+            location_list.append(item[0])
+        } for item in location_data]
+
+        return jsonify(location_list)

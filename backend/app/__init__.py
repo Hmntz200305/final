@@ -55,6 +55,8 @@ api.add_resource(QrScanner, '/api/qrscanner')
 api.add_resource(LeaseTicketScanner, '/api/leaseticketscanner')
 api.add_resource(QrScannerCheck, '/api/qrscannercheck')
 api.add_resource(ListCategory, '/api/getdata-listcategory')
+api.add_resource(ListStatus, '/api/getdata-liststatus')
+api.add_resource(ListLocation, '/api/getdata-listlocation')
 
 
 if __name__ == '__main__':

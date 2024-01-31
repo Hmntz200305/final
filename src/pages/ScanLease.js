@@ -341,7 +341,6 @@ const ScanLease = () => {
                       columns={Columns}
                       data={scannedData || []}
                   />
-
                   <div className='bg-white'>
                       <h2 className='border-t-[1px] border-black pt-4 mt-8'>
                           Untuk melanjutkan tranasaksi peminjaman, silahkan isi formulir dibawah ini:
