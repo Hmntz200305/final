@@ -73,7 +73,7 @@ const History = () => {
         
 
         return (
-            <div className='p-0'>
+            <div className='flex flex-col p-2 gap-1'>
                 <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
                 <div className='flex space-x-[1px]'>
                     <Button className=' cursor-default'>
@@ -207,7 +207,7 @@ const History = () => {
         };
 
         return (
-            <div className='p-0'>
+            <div className='flex flex-col p-2 gap-1'>
                 <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
                 <div className='flex space-x-[1px]'>
                     <Button className=' cursor-default'>
@@ -529,7 +529,7 @@ const History = () => {
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di History page heehe:)</h2>
+                    <h2 className='text-white'>Selamat datang di History page :)</h2>
                 </div>
             </div>
             

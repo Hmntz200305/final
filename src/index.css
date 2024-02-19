@@ -1,3 +1,43 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+/* .MuiTablePagination-root div,
+.MuiTablePagination-root label,
+.MuiTablePagination-root button,
+.MuiTablePagination-root svg 
+{
+  color: #efefef;
+  border-color: #efefef;
+}
+
+.MuiNativeSelect {
+    background-color: #1f2937 !important;
+}
+
+.MuiInputBase-root div,
+.MuiInputBase-root input,
+.MuiInputBase-root svg
+ {
+    color: #efefef;
+}
+
+.MuiOutlinedInput-root 
+.MuiOutlinedInput-notchedOutline {
+    border-color: #efefef !important;
+}
+
+.MuiNativeSelect-select option{
+    color: #1f2937;
+}
+
+.MuiTableCell-head svg,
+.MuiTableCell-head input
+{
+    color: #1f2937 !important;
+}
+
+.MuiBox-root svg 
+{
+    color: #efefef;
+} */

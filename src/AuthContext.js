@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }) => {
   const [ListCategory, setListCategory] = useState([]);
   const [ListStatus, setListStatus] = useState([]);
   const [ListLocation, setListLocation] = useState([]);
+  const [ReturnSubmitedList ,setReturnSubmitedList] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -223,6 +224,24 @@ export const AuthProvider = ({ children }) => {
       });
   }
 
+  const refreshReturnSubmitedList = () => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Authorization': token
+      }
+    };
+    
+    fetch('https://asset.lintasmediadanawa.com:8443/api/getdata-returnsubmited', requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        setReturnSubmitedList(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching status data:', error);
+      });
+  }
+
   const refreshDashboardInfo = () => {
     fetch('https://asset.lintasmediadanawa.com:8443/api/DashboardInfo')
       .then((response) => response.json())
@@ -298,7 +317,7 @@ export const AuthProvider = ({ children }) => {
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   
   return (
-    <AuthContext.Provider value={{ token, email, username, loggedIn, login, logout, refreshAssetData, DataListAsset, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, refreshManageUser, ManageUserData, Role, DataListAssetExcept, refreshAssetDataExcept, AdminList, refreshAdminList, SubmitedList, refreshSubmitedList, refreshDashboardInfo, DashboardInfo, onRequest, inLoans, CountinLoans, refreshDataLoan, DataLoan, Roles, refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, refreshMyReport, MyReport, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, setLoginNotificationStatus, LoginNotificationStatus, refreshListCategory, ListCategory, refreshListStatus, ListStatus, refreshListLocation, ListLocation }}>
+    <AuthContext.Provider value={{ token, email, username, loggedIn, login, logout, refreshAssetData, DataListAsset, refreshStatusList, StatusOptions, refreshLocationList, LocationOptions, refreshCategoryList, CategoryOptions, refreshManageUser, ManageUserData, Role, DataListAssetExcept, refreshAssetDataExcept, AdminList, refreshAdminList, SubmitedList, refreshSubmitedList, refreshDashboardInfo, DashboardInfo, onRequest, inLoans, CountinLoans, refreshDataLoan, DataLoan, Roles, refreshHistoryTicket, HistoryTicket, refreshHistoryLoanData, HistoryLoanData, refreshMyReport, MyReport, setNotification, Notification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, setLoginNotificationStatus, LoginNotificationStatus, refreshListCategory, ListCategory, refreshListStatus, ListStatus, refreshListLocation, ListLocation, ReturnSubmitedList, refreshReturnSubmitedList }}>
       {children}
     </AuthContext.Provider>
   );

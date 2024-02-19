@@ -77,7 +77,7 @@ class UploadCsv(Resource):
 
                         if exist_asset:
                             db.rollback()
-                            return {'message': exist_asset, 'Status': 'error'}
+                            return {'message': f'{exist_asset} IDAsset sudah digunakan', 'Status': 'error'}
                         else:
                             return {'message': 'Import telah berhasil', "Status": "success"}, 200
 

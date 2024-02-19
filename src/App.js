@@ -1,4 +1,3 @@
-import './App.css';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -27,19 +26,22 @@ import Verify from './pages/Verify';
 import ScanAdd from './pages/ScanAdd';
 import ScanLease from './pages/ScanLease';
 import ScanCheck from './pages/ScanCheck';
+import TestListAsset from './TestListAsset';
+import TestLease from './TestLease';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Bounce,  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Card, Typography, List, ListItem, ListItemPrefix, ListItemSuffix, Chip, Accordion, AccordionHeader, AccordionBody, Drawer, Avatar, Popover, PopoverContent,PopoverHandler, Badge } from "@material-tailwind/react";
 
 const Home = () =>  {
-  const { loggedIn, logout, username, Role, Roles, email, Notification, setNotification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar,  } = useAuth();
+  const { loggedIn, logout, username, Role, Roles, email, Notification, setNotification, setNotificationStatus, NotificationStatus, NotificationInfo, setNotificationInfo, openSidebar, setOpenSidebar, ReturnSubmitedList, refreshReturnSubmitedList, SubmitedList , refreshSubmitedList } = useAuth();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(0);
   const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
   const [rotateButton, setRotateButton] = useState(false);
   const [popoverProfile, setPopoverProfile] = useState(false);
   const [activeNotification, setActiveNotification] = useState(null);
+  const [BubbleCount, setBubbleCount] = useState(0);
   const [iconComponent, setIconComponent] = useState(null);
  
   const popoverProfileHandler = {
@@ -72,6 +74,15 @@ const Home = () =>  {
       setOpenSidebar(true);
     }
   };
+
+  useEffect(() => {
+    refreshReturnSubmitedList();
+    refreshSubmitedList();
+    const totalRecords = ReturnSubmitedList.total_records + SubmitedList.total_records;
+    setBubbleCount(totalRecords);
+  }, [ReturnSubmitedList.total_records, SubmitedList.total_records]);
+  
+  
   
   useEffect(() => {
       window.addEventListener('resize', handleResizeMobile);
@@ -402,11 +413,13 @@ const Home = () =>  {
                             <FontAwesomeIcon icon={faPaperPlane} />
                           </ListItemPrefix>
                           Submitted
-                          <ListItemSuffix>
-                            <Badge>
-                              <Chip value="51" size="sm" variant="white" color="gray-800" className="rounded-full" />
-                            </Badge>
-                          </ListItemSuffix>
+                          {BubbleCount > 0 && (
+                            <ListItemSuffix>
+                              <Badge>
+                                <Chip value={BubbleCount} size="sm" variant="white" color="gray-800" className="rounded-full" />
+                              </Badge>
+                            </ListItemSuffix>
+                          )}
                         </ListItem>
                       </Link>
                     ) : null}
@@ -914,6 +927,14 @@ const Home = () =>  {
               <Route 
                 path="/qrgen" 
                 element={Role === 2 ? <QRGen /> : <Dashboard />}
+              />
+              <Route 
+                path="/testlistasset" 
+                element ={<TestListAsset />}  
+              />
+              <Route 
+                path="/testlease" 
+                element ={<TestLease />}  
               />
             </Routes>
         </div>

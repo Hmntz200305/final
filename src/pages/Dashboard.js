@@ -74,7 +74,7 @@ const Dashboard = () => {
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Welcome, Dashboard page tehe :)</h2>
+                    <h2 className='text-white'>Welcome, Dashboard page :)</h2>
                 </div>
                 <div className='bg-white p-5'>
                     <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
@@ -193,69 +193,33 @@ const Dashboard = () => {
                                 </PopoverContent>
                             </Popover>
                         </Link>
-                        <Popover
-                            open={popover6}
-                            handler={setPopover6}
-                        >
-                            <PopoverHandler {... popoverHandler6}>
-                                <div className="dashboard-item bg-white rounded-2xl p-6 flex items-center text-center shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-[#efefef]">
-                                    <div className="dashboard-icon text-white rounded-full text-xl p-3">
-                                        <FontAwesomeIcon icon={faExclamationTriangle} />
-                                    </div>
-                                    <div className="dashboard-text ml-5">
-                                        <div className="dashboard-value text-2xl font-bold">{DashboardInfo.broken}</div>
-                                        <div className="dashboard-label text-[#666] text-sm">Broken Asset</div>
-                                    </div>
-                                </div>
-                            </PopoverHandler>
-                            <PopoverContent>
-                                <Typography variant='small'>
-                                Page not found
-                                </Typography>
-                            </PopoverContent>
-                        </Popover>
-                        <Popover
-                            open={popover7}
-                            handler={setPopover7}
-                        >
-                            <PopoverHandler {... popoverHandler7}>
-                                <div className="dashboard-item bg-white rounded-2xl p-6 flex items-center text-center shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-[#efefef]">
-                                    <div className="dashboard-icon text-white rounded-full text-xl p-3">
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </div>
-                                    <div className="dashboard-text ml-5">
-                                        <div className="dashboard-value text-2xl font-bold">{DashboardInfo.missing}</div>
-                                        <div className="dashboard-label text-[#666] text-sm">Missing Asset</div>
-                                    </div>
-                                </div>
-                            </PopoverHandler>
-                            <PopoverContent>
-                                <Typography variant='small'>
-                                Page not found
-                                </Typography>
-                            </PopoverContent>
-                        </Popover>
-                        <Popover
-                            open={popover8}
-                            handler={setPopover8}
-                        >
-                            <PopoverHandler {... popoverHandler8}>
-                                <div className="dashboard-item bg-white rounded-2xl p-6 flex items-center text-center shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-[#efefef]">
-                                    <div className="dashboard-icon text-white rounded-full text-xl p-3">
-                                        <FontAwesomeIcon icon={faScrewdriverWrench} />
-                                    </div>
-                                    <div className="dashboard-text ml-5">
-                                        <div className="dashboard-value text-2xl font-bold">{DashboardInfo.maintenance}</div>
-                                        <div className="dashboard-label text-[#666] text-sm">Maintenance Asset</div>
-                                    </div>
-                                </div>
-                            </PopoverHandler>
-                            <PopoverContent>
-                                <Typography variant='small'>
-                                    Page not found
-                                </Typography>
-                            </PopoverContent>
-                        </Popover>
+                        <div className="dashboard-item bg-white rounded-2xl p-6 flex items-center text-center shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-[#efefef]">
+                            <div className="dashboard-icon text-white rounded-full text-xl p-3">
+                                <FontAwesomeIcon icon={faExclamationTriangle} />
+                            </div>
+                            <div className="dashboard-text ml-5">
+                                <div className="dashboard-value text-2xl font-bold">{DashboardInfo.broken}</div>
+                                <div className="dashboard-label text-[#666] text-sm">Broken Asset</div>
+                            </div>
+                        </div>
+                        <div className="dashboard-item bg-white rounded-2xl p-6 flex items-center text-center shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-[#efefef]">
+                            <div className="dashboard-icon text-white rounded-full text-xl p-3">
+                                <FontAwesomeIcon icon={faTimesCircle} />
+                            </div>
+                            <div className="dashboard-text ml-5">
+                                <div className="dashboard-value text-2xl font-bold">{DashboardInfo.missing}</div>
+                                <div className="dashboard-label text-[#666] text-sm">Missing Asset</div>
+                            </div>
+                        </div>
+                        <div className="dashboard-item bg-white rounded-2xl p-6 flex items-center text-center shadow-md transform transition-transform duration-300 ease-in-out hover:scale-105 hover:bg-[#efefef]">
+                            <div className="dashboard-icon text-white rounded-full text-xl p-3">
+                                <FontAwesomeIcon icon={faScrewdriverWrench} />
+                            </div>
+                            <div className="dashboard-text ml-5">
+                                <div className="dashboard-value text-2xl font-bold">{DashboardInfo.maintenance}</div>
+                                <div className="dashboard-label text-[#666] text-sm">Maintenance Asset</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

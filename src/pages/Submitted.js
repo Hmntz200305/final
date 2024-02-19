@@ -19,7 +19,7 @@ const Submitted = () => {
             <DataTable 
               className='static z-0'
               columns={columnLease}
-              data={SubmitedList}
+              data={SubmitedList.ticket_list}
               noHeader
               defaultSortField='no'
               defaultSortAsc={false}
@@ -39,7 +39,7 @@ const Submitted = () => {
             <DataTable 
               className='z-0 static'
               columns={columnReturn}
-              data={SubmitedList}
+              data={ReturnSubmitedList.ticket_list}
               noHeader
               defaultSortField='no'
               defaultSortAsc={false}
@@ -51,7 +51,7 @@ const Submitted = () => {
       )
     }
 
-    const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar } = useAuth();
+    const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar, refreshReturnSubmitedList, ReturnSubmitedList } = useAuth();
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTicketSenderName, setSelectedTicketSenderName] = useState(null);
     const [SelectedTicketingAdmin, setSelectedTicketingAdmin] = useState(null);
@@ -86,10 +86,9 @@ const Submitted = () => {
       setDeclineLease(false);
     }
 
-    const openApproveReturn = (idticketadmin, idticket, name) => {
+    const openApproveReturn = (idticket, name) => {
       setSelectedTicketId(idticket);
       setSelectedTicketSenderName(name);
-      setSelectedTicketingAdmin(idticketadmin);
       setApproveReturn(true);
     }
     const closeApproveReturn = () => {
@@ -104,6 +103,7 @@ const Submitted = () => {
     const closeDeclineReturn = () => {
       setDeclineReturn(false);
     }
+    
 
     const showMoreDetailLease = (row) => {
       setSelectedAssetDetails([row]);
@@ -152,6 +152,7 @@ const Submitted = () => {
         const refreshData = async () => {
           if (Role === 1 || Role === 2) {
             await refreshSubmitedList();
+            await refreshReturnSubmitedList();
           }
         };
     refreshData();
@@ -187,6 +188,7 @@ const Submitted = () => {
           setNotificationInfo(data.Status);
           setApproveLease(false);
           refreshSubmitedList();
+          refreshReturnSubmitedList();
           setSelectedTicketId(null);
           setSelectedTicketingAdmin(null);
           setSelectedTicketSenderName(null);
@@ -223,6 +225,81 @@ const Submitted = () => {
           setNotificationInfo(data.Status);
           setDeclineLease(false);
           refreshSubmitedList();
+          refreshReturnSubmitedList();
+          setSelectedTicketId(null);
+          setSelectedTicketingAdmin(null);
+          setSelectedTicketSenderName(null);
+        } else {
+          setNotification('Failed');
+          setNotificationInfo("error");
+          setNotificationStatus(true);
+        }
+      } catch (error) {  
+        console.error('Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleApproveReturn = async (token) => {
+      try {
+        setIsLoading(true);
+  
+        const response = await fetch(
+          `https://asset.lintasmediadanawa.com:8443/api/returnapprove/${selectedTicketId}`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
+  
+        if (response.status === 200) {
+          const data = await response.json();
+          setNotification(data.message);
+          setNotificationStatus(true);
+          setNotificationInfo(data.Status);
+          setApproveReturn(false);
+          refreshSubmitedList();
+          refreshReturnSubmitedList();
+          setSelectedTicketId(null);
+          setSelectedTicketingAdmin(null);
+          setSelectedTicketSenderName(null);
+        } else {
+          setNotification('Failed');
+          setNotificationInfo("error");
+          setNotificationStatus(true);
+        }
+      } catch (error) {  
+        console.error('Error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const handleDeclineReturn = async (token) => {
+      try {
+        setIsLoading(true);
+  
+        const response = await fetch(
+          `https://asset.lintasmediadanawa.com:8443/api/returndecline/${selectedTicketId}`,
+          {
+            method: 'PUT',
+            headers: {
+              Authorization: token,
+            },
+          }
+        );
+  
+        if (response.status === 200) {
+          const data = await response.json();
+          setNotification(data.message);
+          setNotificationStatus(true);
+          setNotificationInfo(data.Status);
+          setDeclineReturn(false);
+          refreshSubmitedList();
+          refreshReturnSubmitedList();
           setSelectedTicketId(null);
           setSelectedTicketingAdmin(null);
           setSelectedTicketSenderName(null);
@@ -370,7 +447,7 @@ const Submitted = () => {
           },
           {
           name: 'Location',
-          selector: (row) => row.location,
+          selector: (row) => row.assetlocation,
           },
           {
           name: 'Category',
@@ -413,21 +490,17 @@ const Submitted = () => {
             },
             {
             name: 'Lokasi',
-            selector: (row) => row.location,
+            selector: (row) => row.assetlocation,
             },
             {
             name: 'Email',
             selector: (row) => row.email,
             },
             {
-            name: 'Note',
-            selector: (row) => row.note,
-            },
-            {
             name: 'Action',
             cell: (row) => (
                 <div className='text-white'>
-                    <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openApproveReturn(row.idticketadmin, row.idticket, row.name)}>
+                    <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openApproveReturn(row.idticket, row.name)}>
                         <FontAwesomeIcon icon={faCheck} />
                     </button>
                     <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openDeclineReturn(row.idticket, row.name)}>
@@ -482,17 +555,21 @@ const Submitted = () => {
                           }}
                       >
                           {data.map(({ label, value }) => (
-                              <Tab
-                                key={value}
-                                value={value}
-                                onClick={() => setActiveTab(value)}
-                                className={activeTab === value ? "text-gray-800" : "hover:text-gray-500"}
-                              >
-                                <Badge>
-                                  {label}
-                                </Badge>
-                              </Tab>
-                          ))}
+                        <Tab
+                          key={value}
+                          value={value}
+                          onClick={() => setActiveTab(value)}
+                          className={activeTab === value ? "text-gray-800" : "hover:text-gray-500"}
+                        >
+                          {ReturnSubmitedList.total_records ? (
+                            <Badge>
+                              {label}
+                            </Badge>
+                          ) : (
+                            label
+                          )}
+                        </Tab>
+                      ))}
                       </TabsHeader>
                       <TabsBody>
                           {data.map(({ value, content }) => (
@@ -691,7 +768,7 @@ const Submitted = () => {
                                 <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
                                 <Button 
                                   className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleApprove(token)}
+                                  onClick={() => handleApproveReturn(token)}
                                   disabled={isLoading}
                                 >
                                     {isLoading ? 'Proses...' : 'Approve'}
@@ -720,7 +797,7 @@ const Submitted = () => {
                                 <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
                                 <Button 
                                   className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
+                                  onClick={() => handleApproveReturn(token)}
                                   disabled={isLoading}
                                 >
                                     {isLoading ? 'Proses...' : 'Decline'}
@@ -751,7 +828,7 @@ const Submitted = () => {
                                 <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
                                 <Button 
                                   className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
+                                  onClick={() => handleDeclineReturn(token)}
                                   disabled={isLoading}
                                 >
                                     {isLoading ? 'Proses...' : 'Decline'}
@@ -780,7 +857,7 @@ const Submitted = () => {
                                 <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
                                 <Button 
                                   className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
+                                  onClick={() => handleDeclineReturn(token)}
                                   disabled={isLoading}
                                 >
                                     {isLoading ? 'Proses...' : 'Decline'}
