@@ -23,16 +23,10 @@ const Lwi = () => {
     return (
         <>
             <div className='p-2'>
-                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Page not found :(</h2>
-                </div>
-            </div>
-
-            <div>
                 <Alert icon={Icon} variant='outlined'>
-                    <div className='flex items-baseline space-x-2'>
-                        <p className='text-lg'>*FYI</p>
-                        <p className='text-sm'>Aplikasi ini didevelop oleh anak PKL jurusan SIJA 47 dari SMKN 1 Cimahi xixixi</p>
+                    <div className='flex flex-col items-baseline space-x-2'>
+                        <p className='text-lg'>Page not found :(</p>
+                        <p className='text-sm'>FYI Aplikasi ini dibuild oleh anak PKL jurusan SIJA-47 dari SMKN 1 Cimahi :)</p>
                     </div>
                 </Alert>
             </div>

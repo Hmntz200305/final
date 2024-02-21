@@ -59,18 +59,22 @@ class Register(Resource):
                         cek = lmd.fetchone()[0]
                         if cek == 0:
                             try:
-                                lmd.execute("INSERT INTO users (username, email, password, role, verified) VALUES (%s, %s, %s, %s, %s)", (username, email, md5password, roles, 0))
-                                lmd.close()
-                                token = key.dumps(email)
-                                msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
-                                verification_url = url_for('verifyemail', token=token, _external=True)
-                                msg.body = f'Klik tautan ini untuk verifikasi email Anda: {verification_url}'
-                                mail.send(msg)
-                                db.commit()
+                                if email:
+                                    lmd.execute("INSERT INTO users (username, email, password, role, verified) VALUES (%s, %s, %s, %s, %s)", (username, email, md5password, roles, 0))
+                                    lmd.close()
+                                    token = key.dumps(email)
+                                    msg = Message('Verifikasi Email', sender='admin.asset@lintasmediadanawa.com', recipients=[email])
+                                    verification_url = url_for('verifyemail', token=token, _external=True)
+                                    msg.body = f'Klik tautan ini untuk verifikasi email Anda: {verification_url}'
+                                    mail.send(msg)
+                                    db.commit()
+                                else:
+                                    print("Invalid email address:", email)
 
                                 return {"message": "Accounts Registration Success, Check your Email for Verification", 'Status': 'success'}
                             except Exception as e:
                                 db.rollback()
+                                print(e)
                                 return {'message': f'Error: {str(e)}'}
                         else:
                             return {"message": "Accounts already exists", "Status": "error"}
@@ -212,7 +216,7 @@ class VerifyEmail(Resource):
                 return {'message': 'Email tidak ditemukan.', "Status": "error"}
         except SignatureExpired:
             new_token = key.dumps(email)
-            msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
+            msg = Message('Verifikasi Email', sender='admin.asset@lintasmediadanawa.com', recipients=[email])
             verification_url = url_for('VerifyEmail', token=new_token, _external=True)  # URL baru
             msg.body = f'Token lama telah kadaluwarsa. Klik tautan ini untuk verifikasi email Anda: {verification_url}'
             mail.send(msg)

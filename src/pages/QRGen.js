@@ -1,8 +1,7 @@
 import React, { useEffect, useState, } from 'react';
-import DataTable from 'react-data-table-component';
-import 'react-data-table-component-extensions/dist/index.css';
+import { MaterialReactTable, useMaterialReactTable, createMRTColumnHelper } from 'material-react-table';
 import { useAuth } from '../AuthContext';
-import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
+import { Input, Menu, MenuList, MenuItem, MenuHandler, Button, Card, CardHeader, Typography } from "@material-tailwind/react";
 
 const QRGen = () => {
     const { setNotification, setNotificationInfo, setNotificationStatus, refreshStatusList, refreshLocationList, refreshCategoryList, openSidebar, setOpenSidebar, StatusOptions, LocationOptions, CategoryOptions } = useAuth();
@@ -24,6 +23,7 @@ const QRGen = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const isMobile = windowWidth <= 768;
     const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
+    const [ tableQr, setTableQr ] = useState(false);
     
     useEffect(() => {
         refreshStatusList();
@@ -33,40 +33,49 @@ const QRGen = () => {
 
     const handleGenQR = async () => {
         try {
-        setIsLoading(true); 
-        const formData = new FormData();
 
-        formData.append('AssetID', AssetID);
-        formData.append('AssetName', AssetName);
-        formData.append('AssetDesc', AssetDesc);
-        formData.append('AssetBrand', AssetBrand);
-        formData.append('AssetModel', AssetModel);
-        formData.append('AssetStatus', AssetStatus);
-        formData.append('AssetLocation', AssetLocation);
-        formData.append('AssetCategory', AssetCategory);
-        formData.append('AssetSN', AssetSN);
+            if (!AssetID || !AssetName || !AssetDesc || !AssetBrand || !AssetModel || !AssetStatus || !AssetLocation || !AssetCategory || !AssetSN) {
+                // Show a notification if any of the required fields is empty
+                setNotification("Please fill in all required fields.");
+                setNotificationStatus(true);
+                setNotificationInfo("error");
+                return;
+            }
+            setIsLoading(true); 
+            const formData = new FormData();
 
-        const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/qrgenerator", {
-            method: "POST",
-            body: formData,
-        });
+            formData.append('AssetID', AssetID);
+            formData.append('AssetName', AssetName);
+            formData.append('AssetDesc', AssetDesc);
+            formData.append('AssetBrand', AssetBrand);
+            formData.append('AssetModel', AssetModel);
+            formData.append('AssetStatus', AssetStatus);
+            formData.append('AssetLocation', AssetLocation);
+            formData.append('AssetCategory', AssetCategory);
+            formData.append('AssetSN', AssetSN);
 
-        if (response.status === 200) {
-            const data = await response.json();
-            setQRCode(data.qr);
-            setNotification(data.message);
-            setNotificationStatus(true);
-            setNotificationInfo(data.Status);
-        } else {
-            const data = await response.json();
-            setNotification(data.message);
-            setNotificationStatus(true);
-            setNotificationInfo(data.Status);
-        }
+            const response = await fetch("https://asset.lintasmediadanawa.com:8443/api/qrgenerator", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                setQRCode(data.qr);
+                setNotification(data.message);
+                setNotificationStatus(true);
+                setNotificationInfo(data.Status);
+            } else {
+                const data = await response.json();
+                setNotification(data.message);
+                setNotificationStatus(true);
+                setNotificationInfo(data.Status);
+            }
         } catch (error) {
         console.error("Error:", error);
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
+            setTableQr(true);
         }
     };
 
@@ -97,6 +106,9 @@ const QRGen = () => {
         setAssetStatus('');
         setAssetLocation('');
         setAssetCategory('');
+        setInputValueStatus('');
+        setInputValueLocation('');
+        setInputValueCategory('');
         setAssetSN('');
         setQRCode('');
         }
@@ -162,257 +174,294 @@ const QRGen = () => {
       };
     }, []);
 
-
+    const columnHelper = createMRTColumnHelper();
     const columns = [
-        {
-            name: 'QR Code',
-            selector: row => row['QRCode'],
-            cell: (row) => (
-            <div className='flex flex-col items-center justify-center'>
-                <img src={row.QRCode} alt="QRCode" style={{ width: '50px', height: '50px' }} />
-                <button onClick={() => handleDownload(row.QRCode, row.AssetID)} className='text-blue-300 underline'>
-                    Download
-                </button>
-            </div>
+        columnHelper.accessor('QRCode', {
+            header: 'QR Code',
+            size: 100,
+            Cell: ({ row }) => (
+                <div className='flex flex-col items-center justify-center'>
+                    <img src={row.original.QRCode} alt="QRCode" style={{ width: '50px', height: '50px' }} />
+                    <button onClick={() => handleDownload(row.original.QRCode, row.original.AssetID)} className='text-blue-300 underline'>
+                        Download
+                    </button>
+                </div>
             ),
-            export: true,
-        },
-        {
-            name: 'ID Asset',
-            selector: row => row['AssetID'],
-            export: true
-        },
-        {
-            name: 'Name',
-            selector: row => row['AssetName'],
-            export: true
-        },
-        {
-            name: 'Description',
-            selector: row => row['AssetDesc'],
-            export: true
-        },
-        {
-            name: 'Brand',
-            selector: row => row['AssetBrand'],
-            export: true
-        },
-        {
-            name: 'Model',
-            selector: row => row['AssetModel'],
-            export: true
-        },
-        {
-            name: 'Status',
-            selector: row => row['AssetStatus'],
-            export: true
-        },
-        {
-            name: 'Location',
-            selector: row => row['AssetLocation'],
-            export: true
-        },
-        {
-            name: 'Category',
-            selector: row => row['AssetCategory'],
-            export: true
-        },
-        {
-            name: 'SN',
-            selector: row => row['AssetSN'],
-            export: true
-        },
-    ]
+        }),
+        columnHelper.accessor('AssetID', {
+            header: 'ID Asset',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetName', {
+            header: 'Name',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetDesc', {
+            header: 'Description',
+            size: 250,
+        }),
+        columnHelper.accessor('AssetBrand', {
+            header: 'Brand',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetModel', {
+            header: 'Model',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetStatus', {
+            header: 'Status',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetLocation', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetCategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetSN', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        ];
+
+        const tableQR = useMaterialReactTable({
+            columns,
+            data: tableData || [],
+            enableTopToolbar: false,
+            enableBottomToolbar: false,
+            enableColumnActions: false,
+            enableSorting: false,
+            displayColumnDefOptions: {
+                'mrt-row-select': {
+                    size: 20,
+                    grow: false,
+                },
+                'mrt-row-numbers': {
+                    size: 20,
+                    grow: true,
+                },
+            },
+            muiTablePaperProps: {
+                elevation: 0,
+                sx: {
+                    borderRadius: '0',
+                    border: '1px solid #ffffff',
+                },
+            },
+            muiTableBodyProps: {
+                sx: {
+                    '& tr:nth-of-type(odd) > td': {
+                    backgroundColor: '#f5f5f5',
+                    },
+                },
+            },
+        });
 
   return (
     <>
         <div className='p-2'>
-            <div className='bg-gray-800 rounded-2xl p-4 shadow'>
+            <div className='bg-gray-800 rounded-2xl p-4 shadow mb-8'>
                 <h2 className='text-white'>Welcome, QR Generator Page :)</h2>
             </div>
-        </div>
-
-        <div className='p-2'>
-            <div className='bg-white rounded-2xl shadow p-4 space-y-4'>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>ID</label>
-                    <Input 
-                    variant="outline"
-                    label="Input Asset ID"
-                    value={AssetID}
-                    onChange={(e) => setAssetID(e.target.value)}
-                    required
-                    />
-                </div>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Name</label>
-                    <Input
-                    variant="outline"
-                    label="Input Asset Name"
-                    value={AssetName}
-                    onChange={(e) => setAssetName(e.target.value)} 
-                    required 
-                    />
-                </div>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Description</label>
-                    <Input 
-                    variant="outline" 
-                    label="Input Asset Description"
-                    value={AssetDesc}
-                    onChange={(e) => setAssetDesc(e.target.value)} 
-                    required
-                    />
-                </div>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Brand</label>
-                    <Input 
-                    variant="outline" 
-                    label="Input Asset Brand" 
-                    value={AssetBrand}
-                    onChange={(e) => setAssetBrand(e.target.value)} 
-                    required
-                    />
-                </div>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Model</label>
-                    <Input 
-                    variant="outline" 
-                    label="Input Asset Model"
-                    value={AssetModel}
-                    onChange={(e) => setAssetModel(e.target.value)}  
-                    required
-                    />
-                </div>
-
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Status</label>
-                    <div className='flex items-center w-full relative '>
-                        <Menu placement="bottom-start">
-                            <MenuHandler>
-                            <Button
-                                ripple={false}
-                                variant="text"
-                                color="blue-gray"
-                                className="border border-blue-gray-200 px-4 rounded-r-none"
-                            >
-                                Select
-                            </Button>
-                            </MenuHandler>
-                            <MenuList className="max-w-[18rem]">
-                            {StatusOptions.map((status) => (
-                                <MenuItem key={status.id} value={status.status} onClick={() => handleOptionSelectStatus(status.status)}>
-                                {status.status}
-                                </MenuItem>
-                            ))}
-                            </MenuList>
-                        </Menu>
+            <Card floated={false} shadow={false} color='transparent'>
+                <CardHeader
+                    floated={false}
+                    shadow={false}
+                    color="transparent"
+                    className="m-0 mb-4 flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+                >
+                    <div>
+                        <Typography variant="h6" color="blue-gray">
+                            QR Generator Form
+                        </Typography>
+                        <Typography
+                            variant="small"
+                            color="gray"
+                            className="max-w-sm font-normal"
+                        >
+                            Please fill in the column below with details of the assets to be Generate to QR.
+                        </Typography>
+                    </div>
+                </CardHeader>
+                <Card className='p-4 space-y-4'>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>ID</label>
                         <Input 
-                            className='w-full rounded-l-none'
-                            type="text"
-                            value={inputValueStatus}
-                            onChange={(e) => setInputValueStatus(e.target.value)}
-                            disabled
-                            required
-                            label='Input Asset Status'
+                        variant="outline"
+                        label="Input Asset ID"
+                        value={AssetID}
+                        onChange={(e) => setAssetID(e.target.value)}
+                        required
                         />
                     </div>
-                </div>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Location</label>
-                    <div className='flex items-center w-full relative'>
-                        <Menu placement="bottom-start">
-                            <MenuHandler>
-                            <Button
-                                ripple={false}
-                                variant="text"
-                                color="blue-gray"
-                                className="border border-blue-gray-200 px-4 rounded-r-none"
-                            >
-                                Select
-                            </Button>
-                            </MenuHandler>
-                            <MenuList className="max-w-[18rem]">
-                            {LocationOptions.map((location) => (
-                                <MenuItem value={location.location} key={location.id} onClick={() => handleOptionSelectLocation(location.location)}>
-                                {location.location}
-                                </MenuItem>
-                            ))}
-                            </MenuList>
-                        </Menu>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Name</label>
                         <Input
-                            className='w-full rounded-l-none'
-                            type="text"
-                            value={inputValueLocation}
-                            onChange={(e) => setInputValueLocation(e.target.value)}
-                            disabled
-                            required
-                            label='Input Asset Location'
+                        variant="outline"
+                        label="Input Asset Name"
+                        value={AssetName}
+                        onChange={(e) => setAssetName(e.target.value)} 
+                        required 
                         />
                     </div>
-                </div>
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Category</label>
-                    <div className='flex items-center w-full relative'>
-                        <Menu placement="bottom-start">
-                            <MenuHandler>
-                            <Button
-                                ripple={false}
-                                variant="text"
-                                color="blue-gray"
-                                className="border border-blue-gray-200 px-4 rounded-r-none"
-                            >
-                                Select
-                            </Button>
-                            </MenuHandler>
-                            <MenuList className="max-w-[18rem]">
-                            {CategoryOptions.map((category) => (
-                                <MenuItem value={category.category} key={category.id} onClick={() => handleOptionSelectCategory(category.category)}>
-                                {category.category}
-                                </MenuItem>
-                            ))}
-                            </MenuList>
-                        </Menu>
-                        <Input
-                            className='w-full rounded-l-none'
-                            type="text"
-                            value={inputValueCategory}
-                            onChange={(e) => setInputValueCategory(e.target.value)}
-                            disabled
-                            required
-                            label='Input Asset Category'
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Description</label>
+                        <Input 
+                        variant="outline" 
+                        label="Input Asset Description"
+                        value={AssetDesc}
+                        onChange={(e) => setAssetDesc(e.target.value)} 
+                        required
                         />
                     </div>
-                </div>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Brand</label>
+                        <Input 
+                        variant="outline" 
+                        label="Input Asset Brand" 
+                        value={AssetBrand}
+                        onChange={(e) => setAssetBrand(e.target.value)} 
+                        required
+                        />
+                    </div>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Model</label>
+                        <Input 
+                        variant="outline" 
+                        label="Input Asset Model"
+                        value={AssetModel}
+                        onChange={(e) => setAssetModel(e.target.value)}  
+                        required
+                        />
+                    </div>
 
-                <div className='flex items-center gap-4'>
-                    <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Serial Number</label>
-                    <Input 
-                    variant="outline" 
-                    label="Input Asset Serial Number"
-                    value={AssetSN}
-                    onChange={(e) => setAssetSN(e.target.value)}  
-                    required
-                    />
-                </div>
-                <div className='flex justify-end'>
-                    <Button type="button" className='' id="edit-button" onClick={handleGenQR} disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate'}</Button>
-                </div>
-                <div className='p-2'>
-                    <div className='bg-white p-2'>
-                        <DataTable
-                            columns={columns}
-                            data={tableData}
-                            noHeader
-                            defaultSortField='no'
-                            defaultSortAsc={false}
-                            pagination
-                            highlightOnHover
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Status</label>
+                        <div className='flex items-center w-full relative '>
+                            <Menu placement="bottom-start">
+                                <MenuHandler>
+                                <Button
+                                    ripple={false}
+                                    variant="text"
+                                    color="blue-gray"
+                                    className="border border-blue-gray-200 px-4 rounded-r-none"
+                                >
+                                    Select
+                                </Button>
+                                </MenuHandler>
+                                <MenuList className="max-w-[18rem]">
+                                {StatusOptions.map((status) => (
+                                    <MenuItem key={status.id} value={status.status} onClick={() => handleOptionSelectStatus(status.status)}>
+                                    {status.status}
+                                    </MenuItem>
+                                ))}
+                                </MenuList>
+                            </Menu>
+                            <Input 
+                                className='w-full rounded-l-none'
+                                type="text"
+                                value={inputValueStatus}
+                                onChange={(e) => setInputValueStatus(e.target.value)}
+                                disabled
+                                required
+                                label='Input Asset Status'
+                            />
+                        </div>
+                    </div>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Location</label>
+                        <div className='flex items-center w-full relative'>
+                            <Menu placement="bottom-start">
+                                <MenuHandler>
+                                <Button
+                                    ripple={false}
+                                    variant="text"
+                                    color="blue-gray"
+                                    className="border border-blue-gray-200 px-4 rounded-r-none"
+                                >
+                                    Select
+                                </Button>
+                                </MenuHandler>
+                                <MenuList className="max-w-[18rem]">
+                                {LocationOptions.map((location) => (
+                                    <MenuItem value={location.location} key={location.id} onClick={() => handleOptionSelectLocation(location.location)}>
+                                    {location.location}
+                                    </MenuItem>
+                                ))}
+                                </MenuList>
+                            </Menu>
+                            <Input
+                                className='w-full rounded-l-none'
+                                type="text"
+                                value={inputValueLocation}
+                                onChange={(e) => setInputValueLocation(e.target.value)}
+                                disabled
+                                required
+                                label='Input Asset Location'
+                            />
+                        </div>
+                    </div>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Category</label>
+                        <div className='flex items-center w-full relative'>
+                            <Menu placement="bottom-start">
+                                <MenuHandler>
+                                <Button
+                                    ripple={false}
+                                    variant="text"
+                                    color="blue-gray"
+                                    className="border border-blue-gray-200 px-4 rounded-r-none"
+                                >
+                                    Select
+                                </Button>
+                                </MenuHandler>
+                                <MenuList className="max-w-[18rem]">
+                                {CategoryOptions.map((category) => (
+                                    <MenuItem value={category.category} key={category.id} onClick={() => handleOptionSelectCategory(category.category)}>
+                                    {category.category}
+                                    </MenuItem>
+                                ))}
+                                </MenuList>
+                            </Menu>
+                            <Input
+                                className='w-full rounded-l-none'
+                                type="text"
+                                value={inputValueCategory}
+                                onChange={(e) => setInputValueCategory(e.target.value)}
+                                disabled
+                                required
+                                label='Input Asset Category'
+                            />
+                        </div>
+                    </div>
+                    <div className='flex items-center gap-4'>
+                        <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Serial Number</label>
+                        <Input 
+                        variant="outline" 
+                        label="Input Asset Serial Number"
+                        value={AssetSN}
+                        onChange={(e) => setAssetSN(e.target.value)}  
+                        required
                         />
                     </div>
-                </div>
-            </div>
+                    <div className='flex justify-end'>
+                        <Button type="button" className='bg-gray-800' id="edit-button" onClick={handleGenQR} disabled={isLoading}>{isLoading ? 'Generating...' : 'Generate'}</Button>
+                    </div>
+                    <div className='p-2'>
+                        {tableQr && (
+                            <div className='bg-white p-2'>
+                                <MaterialReactTable
+                                    table={tableQR}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </Card>
+            </Card>
         </div>
+
     </>
   );
 };

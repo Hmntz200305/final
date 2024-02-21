@@ -1,8 +1,6 @@
 import React, { useState, useEffect} from 'react'
-import DataTable from 'react-data-table-component';
-import DataTableExtensions from 'react-data-table-component-extensions';
-import 'react-data-table-component-extensions/dist/index.css';
-import { faCircleInfo, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { MaterialReactTable, useMaterialReactTable, createMRTColumnHelper } from 'material-react-table';
+import { faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@material-tailwind/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Modal from 'react-modal';
@@ -18,7 +16,7 @@ const MyReport = () => {
      const [windowWidth, setWindowWidth] = useState(window.innerWidth);
      const isMobile = windowWidth <= 768;
      const [isDesktopView, setIsDesktopView] = useState(window.innerWidth > 768);
-
+     const columnHelper = createMRTColumnHelper();
 
     const handleResizeMobile = () => {
         setIsDesktopView(window.innerWidth > 768);
@@ -59,7 +57,6 @@ const MyReport = () => {
         return () => {
             window.removeEventListener("beforeunload", refreshData);
         };
-        // eslint-disable-next-line
     }, [Role]);
     
     useEffect(() => {
@@ -71,14 +68,14 @@ const MyReport = () => {
                 const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
                 return {
                     ...item,
-                    timeRemaining: `${daysRemaining} Hari (otomatis)`,
+                    timeRemaining: `${daysRemaining} Days`,
                 };
             });
             setDataWithRemainingTime(dataWithTimeRemaining);
         }
     }, [MyReport.myreport_list]);
 
-    const [showDelete, setShowDelete] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
 
     // Modal
     const [showModalAsset, setShowModalAsset] = useState(false);
@@ -91,13 +88,12 @@ const MyReport = () => {
         setShowModalAsset(false);
     };
 
-    const showDeleteHandler = (id) => {
+    const deleteModalHandler = (id) => {
         setselectedMyReportID(id);
-        setShowDelete((prev) => !prev);
+        setDeleteModal((prev) => !prev);
+        console.log('delete modal')
     };
 
-
-    // 
     const handleDelete = async (token) => {
         try {
           setIsLoading(true);
@@ -114,7 +110,7 @@ const MyReport = () => {
     
           if (response.status === 200) {
             const data = await response.json();
-            setShowDelete(false);
+            setDeleteModal((prev) => !prev);
             refreshMyReport();
             setNotification(data.message);
             setNotificationStatus(true);
@@ -131,221 +127,296 @@ const MyReport = () => {
         }
       };
 
-    const morecolumn = [
-        {
-            name: 'ID Asset',
-            selector: (row) => row.asset,
-            },
-            {
-            name: 'Name',
-            selector: (row) => row.assetname,
-            },
-            {
-            name: 'Description',
-            selector: (row) => row.assetdescription,
-            },
-            {
-            name: 'Brand',
-            selector: (row) => row.assetbrand,
-            },
-            {
-            name: 'Model',
-            selector: (row) => row.assetmodel,
-            },
-            {
-            name: 'Status',
-            selector: (row) => row.assetstatus,
-            },
-            {
-            name: 'Location',
-            selector: (row) => row.assetlocation,
-            },
-            {
-            name: 'Category',
-            selector: (row) => row.assetcategory,
-            },
-            {
-            name: 'SN',
-            selector: (row) => row.assetsn,
-            },
-            {
-            name: 'Photo',
-            cell: (row) => (
+    const columnReport = [
+        columnHelper.accessor('no', {
+          header: 'No',
+          size: 50,
+        }),
+        columnHelper.accessor('asset', {
+          header: 'ID Asset',
+          size: 150,
+        }),
+        columnHelper.accessor('leasedate', {
+          header: 'Lease Date',
+          size: 150,
+        }),
+        columnHelper.accessor('returndate', {
+          header: 'Return Date',
+          size: 150,
+        }),
+        columnHelper.accessor('timeRemaining', {
+          header: 'Time Remaining',
+        }),
+        columnHelper.accessor('submitted1', {
+          header: 'Submitted #1',
+          size: 150,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='flex flex-col'>
                 <div>
-                <img src={row.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
-                </div>
-            ),
-            },
-    ]
-
-    const columns = [
-        {
-            name: 'No',
-            selector: (row) => row.no,
-            },
-            {
-            name: 'ID Asset',
-            selector: (row) => row.asset,
-            },
-            {
-            name: 'Lease Date',
-            selector: (row) => row.leasedate,
-            },
-            {
-            name: 'Return Date',
-            selector: (row) => row.returndate,
-            },
-            {
-            name: 'Time Remaining',
-            selector: (row) => row.timeRemaining,
-            },
-            {
-            name: 'Submitted #1',
-            cell: (row) => (
-                <div className='flex flex-col'>
-                    <div>
-                      {row.admin1status === 'on Request' ? (
-                        <p>
-                            <span>{row.admin1}'s Approval Pending</span>
-                        </p>
-                      ) : (
-                        <div>
-                            <p>
-                                <span>{row.admin1} </span>
-                                <span> has </span>
-                                {row.admin1status === 'Approved' ? (
-                                    <span className='text-green-500 font-semibold'>{row.admin1status}</span>
-                                ) : (
-                                    <span className='text-red-500 font-semibold'>{row.admin1status}</span>
-                                )}
-                            </p>
-                        </div>
-                      )}
-                    </div>
-                </div>
-            ),
-            },
-            {
-            name: 'Submitted #2',
-            cell: (row) => (
-                <div className='flex flex-col'>
-                    <div>
-                      {row.admin2status === 'on Request' ? (
-                        <p>
-                            <span>{row.admin2}'s Approval Pending</span>
-                        </p>
-                      ) : (
-                        <div>
-                            <p>
-                                <span>{row.admin2} </span>
-                                <span> has </span>
-                                {row.admin2status === 'Approved' ? (
-                                    <span className='text-green-500 font-semibold'>{row.admin2status}</span>
-                                ) : (
-                                    <span className='text-red-500 font-semibold'>{row.admin2status}</span>
-                                )}
-                            </p>
-                        </div>
-                      )}
-                    </div>
-                </div>
-            ),
-            },
-            {
-            name: 'Status',
-            cell: (row) => (
-                <div className='flex flex-col'>
-                    <div>
-                      {row.statusticket === 'on Request' ? (
-                        <p>Approval Pending</p>
-                      ) : (
-                        <div>
-                            <p>
-                                {row.statusticket === 'Approved' ? (
-                                    <span className='text-green-500 font-semibold'>{row.statusticket}</span>
-                                ) : (
-                                    <span className='text-red-500 font-semibold'>{row.statusticket}</span>
-                                )}
-                            </p>
-                        </div>
-                      )}
-                    </div>
-                </div>
-            ),
-            },
-            {
-                name: 'More Detail',
-                cell: (row) => (
-                    <div className='text-white flex items-center justify-center cursor-pointer'>
-                      <button 
-                        className='bg-gray-800 p-1 rounded-lg' 
-                        onClick={() => showMoreDetailHandler(row)}
-                      >
-                        <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
-                      </button>
-                    </div>
-                  ),
-                },
-            {
-            name: 'Action',
-            cell: (row) => (
-                <div className='text-white'>
-                    {row.statusticket === 'Approved' || row.statusticket === 'Decline' ? (
-                        <button 
-                            className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' 
-                            onClick={() => showDeleteHandler(row.idticket)}
-                        >
-                            <FontAwesomeIcon icon={faTrash} />
-                        </button>
+                    {row.original.admin1status === 'on Request' ? (
+                    <p>
+                        <span>{row.original.admin1}'s Approval Pending</span>
+                    </p>
                     ) : (
-                        <button 
-                            className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' 
-                            onClick={() => showDeleteHandler(row.idticket)} disabled
-                        >
-                            <FontAwesomeIcon icon={faTrash} />
-                        </button>
+                    <div>
+                        <p>
+                            <span>{row.original.admin1} </span>
+                            <span> has </span>
+                            {row.original.admin1status === 'Approved' ? (
+                                <span className='text-green-500 font-semibold'>{row.original.admin1status}</span>
+                            ) : (
+                                <span className='text-red-500 font-semibold'>{row.original.admin1status}</span>
+                            )}
+                        </p>
+                    </div>
                     )}
                 </div>
-                ),
+            </div>
+          ),
+        }),
+        columnHelper.accessor('submitted2', {
+          header: 'Submitted #2',
+          size: 150,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='flex flex-col'>
+                <div>
+                    {row.original.admin1status === 'on Request' ? (
+                    <p>
+                        <span>{row.original.admin1}'s Approval Pending</span>
+                    </p>
+                    ) : (
+                    <div>
+                        <p>
+                            <span>{row.original.admin2} </span>
+                            <span> has </span>
+                            {row.original.admin1status === 'Approved' ? (
+                                <span className='text-green-500 font-semibold'>{row.original.admin2status}</span>
+                            ) : (
+                                <span className='text-red-500 font-semibold'>{row.original.admin2status}</span>
+                            )}
+                        </p>
+                    </div>
+                    )}
+                </div>
+            </div>
+          ),
+        }),
+        columnHelper.accessor('status', {
+          header: 'Status',
+          size: 150,
+          Cell: ({ row }) => (
+            <div className='flex flex-col'>
+                <div>
+                    {row.original.statusticket === 'on Request' ? (
+                    <p>Approval Pending</p>
+                    ) : (
+                    <div>
+                        <p>
+                            {row.original.statusticket === 'Approved' ? (
+                                <span className='text-green-500 font-semibold'>{row.original.statusticket}</span>
+                            ) : (
+                                <span className='text-red-500 font-semibold'>{row.original.statusticket}</span>
+                            )}
+                        </p>
+                    </div>
+                    )}
+                </div>
+            </div>
+          ),
+        }),
+        columnHelper.accessor('more', {
+          header: 'More Detail',
+          size: 50,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white flex items-center justify-center cursor-pointer'>
+                <button 
+                className='bg-gray-800 py-[1px] px-3 rounded-xl' 
+                onClick={() => showMoreDetailHandler(row.original)}
+                >
+                <FontAwesomeIcon icon={faEllipsis} size='xl'/>
+                </button>
+            </div>
+          ),
+        }),
+        columnHelper.accessor('action', {
+          header: 'Action',
+          size: 50,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white'>
+                {row.original.statusticket === 'Approved' || row.original.statusticket === 'Decline' ? (
+                    <button 
+                        className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' 
+                        onClick={() => deleteModalHandler(row.original.idticket)}
+                    >
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                ) : (
+                    <button 
+                        className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' 
+                        onClick={() => deleteModalHandler(row.original.idticket)}
+                    >
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                )}
+            </div>
+          ),
+        }),
+      ];
+
+    const tableReport = useMaterialReactTable({
+        columns: columnReport,
+        data: dataWithRemainingTime || [],
+        enableFullScreenToggle: false,
+        positionToolbarAlertBanner: 'none',
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
             },
-    ]
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
+            },
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+              borderRadius: '0',
+              border: '1px solid #ffffff',
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+              '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+              },
+            },
+        },
+        muiTopToolbarProps: {
+            sx: {
+              backgroundColor: '#1f2937',
+            },
+        },
+        muiBottomToolbarProps: {
+            sx: {
+                backgroundColor: '#1f2937',
+            },
+        },
+        muiTableHeadCellProps: {
+            sx: {
+              fontWeight: 'bold',
+              fontSize: '14px',
+            },
+        },
+        muiSearchTextFieldProps: {
+          size: 'small',
+          variant: 'outlined',
+        },
+        paginationDisplayMode: 'pages',
+        muiPaginationProps: {
+            color: 'standard',
+            rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+            pageSize: 5,
+            shape: 'rounded',
+            variant: 'outlined',
+        },
+    });
+
+    const columnMore = [
+        columnHelper.accessor('asset', {
+            header: 'ID Asset',
+            size: 150,
+        }),
+        columnHelper.accessor('assetname', {
+            header: 'Name',
+            size: 150,
+        }),
+        columnHelper.accessor('assetdescription', {
+            header: 'Description',
+            size: 250,
+        }),
+        columnHelper.accessor('assetbrand', {
+            header: 'Brand',
+            size: 150,
+        }),
+        columnHelper.accessor('assetmodel', {
+            header: 'Model',
+            size: 150,
+        }),
+        columnHelper.accessor('assetstatus', {
+            header: 'Status',
+            size: 150,
+        }),
+        columnHelper.accessor('assetlocation', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('assetcategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsn', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        columnHelper.accessor('image_path', {
+            header: 'Photo',
+            size: 100,
+            Cell: ({ row }) => (
+                <div>
+                    <img src={row.original.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
+                </div>
+            ),
+        }),
+        ];
+
+    const tableMore = useMaterialReactTable({
+        columns: columnMore,
+        data: selectedAssetDetails || [],
+        enableTopToolbar: false,
+        enableBottomToolbar: false,
+        enableColumnActions: false,
+        enableSorting: false,
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
+            },
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
+            },
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+                borderRadius: '0',
+                border: '1px solid #ffffff',
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+                '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+                },
+            },
+        },
+    });
     
     return (
         <>
             <div className='p-2'>
-                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di My Report page :)</h2>
+                <div className='bg-gray-800 mb-8 rounded-2xl p-4 shadow'>
+                    <h2 className='text-white'>Welcome, My Report page :)</h2>
                 </div>
-            </div>
-
-            {showDelete && (
-            <div className='p-2'>
-                <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                    <div className='flex flex-col text-center mb-2'>
-                    <h1 className="text-2xl font-semibold">Select Action</h1>
-                    <p>Apakah anda yakin ingin menghapus Report ini?</p>
-                    </div>
-                    
-                    <div className="flex space-x-4 mt-5">
-                    <Button 
-                    className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" 
-                    onClick={showDeleteHandler}
-                    >
-                        Cancel
-                    </Button>
-                    <Button 
-                    className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded"
-                    onClick={() => handleDelete(token)}
-                    disabled={isLoading}
-                    >
-                        {isLoading ? 'Proses...' : 'Delete'}
-                    </Button>
-                    </div>
-                </div>
-            </div>
-            )}
-
-            <div className='p-2'>
                 <div className='p-2 bg-white'>
                     <div className='p-3 flex gap-1'>
                         <div className='flex gap-1'>
@@ -360,25 +431,100 @@ const MyReport = () => {
                         </div>   
                     </div>
                 </div>
+                <div className='mt-1'>
+                    <MaterialReactTable
+                        table={tableReport}
+                    />
+                </div>
             </div>
+
             
+            {isDesktopView && (
+                <Modal
+                    isOpen={deleteModal}
+                    onRequestClose={deleteModalHandler}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2'>
+                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                            <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Are you sure you want to delete this Report?</p>
+                            </div>
+                            
+                            <div className="flex space-x-4 mt-5">
+                            <Button 
+                            className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" 
+                            onClick={deleteModalHandler}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                            className="bg-red-500 hover:bg-red-600 shadow-none"
+                            onClick={() => handleDelete(token)}
+                            disabled={isLoading}
+                            >
+                                {isLoading ? 'Proses...' : 'Delete'}
+                            </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            {!isDesktopView && (
+                <Modal
+                    isOpen={showModalAsset}
+                    onRequestClose={closeModalAssetHandle}
+                    contentLabel="Contoh Modal"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    className='modal-content bg-transparent p-4 w-screen'
+                    shouldCloseOnOverlayClick={false}
+                    >
+                    <div className='p-2'>
+                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                            <div className='flex flex-col text-center mb-2'>
+                            <h1 className="text-2xl font-semibold">Select Action</h1>
+                            <p>Are you sure you want to delete this Report?</p>
+                            </div>
+                            
+                            <div className="flex space-x-4 mt-5">
+                            <Button 
+                            className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" 
+                            onClick={deleteModalHandler}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                            className="bg-red-500 hover:bg-red-600 shadow-none"
+                            onClick={() => handleDelete(token)}
+                            disabled={isLoading}
+                            >
+                                {isLoading ? 'Proses...' : 'Delete'}
+                            </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
             {isDesktopView && (
                 <Modal
                     isOpen={showModalAsset}
                     onRequestClose={closeModalAssetHandle}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                     className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset</h1>
-                            <DataTable
-                                columns={morecolumn}
-                                data={selectedAssetDetails}
-                                highlightOnHover
+                        <h1>The following is a complete asset detail</h1>
+                            <MaterialReactTable
+                                table={tableMore}
                             />
-                        <Button onClick={closeModalAssetHandle} className=" mt-4">
+                        <Button onClick={closeModalAssetHandle} className="bg-gray-800 mt-4">
                             Close
                         </Button>
                     </div>
@@ -389,47 +535,21 @@ const MyReport = () => {
                     isOpen={showModalAsset}
                     onRequestClose={closeModalAssetHandle}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                     className='modal-content bg-transparent p-4 w-screen'
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset</h1>
-                            <DataTable
-                                columns={morecolumn}
-                                data={selectedAssetDetails}
-                                highlightOnHover
+                        <h1>The following is a complete asset detail</h1>
+                            <MaterialReactTable
+                                table={tableMore}
                             />
-                        <Button onClick={closeModalAssetHandle} className=" mt-4">
+                        <Button onClick={closeModalAssetHandle} className="bg-gray-800 mt-4">
                             Close
                         </Button>
                     </div>
                 </Modal>
             )}
-
-            <div className='p-2'>
-                <DataTableExtensions
-                columns={columns}
-                data={dataWithRemainingTime}
-                fileName='hehe'
-                filter
-                print={false}
-                export={false}
-                exportHeaders={false}
-                filterPlaceholder='Filter Data'
-                
-                >
-                <DataTable
-                    noHeader
-                    defaultSortField='no'
-                    defaultSortAsc={false}
-                    pagination
-                    highlightOnHover
-                    paginationRowsPerPageOptions={[5, 10, 20, 50]} // Pilihan jumlah baris per halaman
-                    paginationPerPage={5} // Jumlah baris per halaman default
-                />
-                </DataTableExtensions>
-            </div>
         </>
     )
 }

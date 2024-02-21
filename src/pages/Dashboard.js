@@ -4,7 +4,8 @@ import { faShareFromSquare } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
 import { Link } from 'react-router-dom'
-import { Popover, PopoverContent, PopoverHandler, Typography } from '@material-tailwind/react';
+import { Popover, PopoverContent, PopoverHandler, Typography, Card, CardHeader } from '@material-tailwind/react';
+import Chart from "react-apexcharts";
 
 const Dashboard = () => {
     const { refreshDashboardInfo, DashboardInfo, onRequest, inLoans, Role } = useAuth();
@@ -13,9 +14,14 @@ const Dashboard = () => {
     const [popover3, setPopover3] = useState(false);
     const [popover4, setPopover4] = useState(false);
     const [popover5, setPopover5] = useState(false);
-    const [popover6, setPopover6] = useState(false);
-    const [popover7, setPopover7] = useState(false);
-    const [popover8, setPopover8] = useState(false);
+    const totalAssets = DashboardInfo ? DashboardInfo.total_assets : 0;
+    const availableAssets = DashboardInfo ? DashboardInfo.available : 0;
+    const submittedAssets = onRequest || 0;
+    const leasedAssets = inLoans || 0;
+    const returnedAssets = DashboardInfo ? DashboardInfo.returning : 0;
+    const brokenAssets = DashboardInfo ? DashboardInfo.broken : 0;
+    const missingAssets = DashboardInfo ? DashboardInfo.missing : 0;
+    const maintenanceAssets = DashboardInfo ? DashboardInfo.maintenance : 0;
 
     const popoverHandler1 = {
         onMouseEnter: () => setPopover1(true),
@@ -36,18 +42,6 @@ const Dashboard = () => {
     const popoverHandler5 = {
         onMouseEnter: () => setPopover5(true),
         onMouseLeave: () => setPopover5(false),
-    };
-    const popoverHandler6 = {
-        onMouseEnter: () => setPopover6(true),
-        onMouseLeave: () => setPopover6(false),
-    };
-    const popoverHandler7 = {
-        onMouseEnter: () => setPopover7(true),
-        onMouseLeave: () => setPopover7(false),
-    };
-    const popoverHandler8 = {
-        onMouseEnter: () => setPopover8(true),
-        onMouseLeave: () => setPopover8(false),
     };
 
     useEffect(() => {
@@ -70,14 +64,167 @@ const Dashboard = () => {
         });
     }, []);
 
+    const seriesData = [
+        totalAssets,
+        availableAssets,
+        submittedAssets,
+        leasedAssets,
+        returnedAssets,
+        brokenAssets,
+        missingAssets,
+        maintenanceAssets,
+    ];
+    
+    const filteredSeriesData = seriesData.filter(data => typeof data !== 'undefined');
+    
+    const barChart = {
+        type: "bar",
+        height: 300,
+        series: [
+          {
+            name: "Value",
+            data: filteredSeriesData,
+          },
+        ],
+        options: {
+          chart: {
+            toolbar: {
+              show: false,
+            },
+          },
+          title: {
+            show: "",
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          colors: ["#020617"],
+          plotOptions: {
+            bar: {
+              columnWidth: "40%",
+              borderRadius: 2,
+            },
+          },
+          xaxis: {
+            axisTicks: {
+              show: false,
+            },
+            axisBorder: {
+              show: false,
+            },
+            labels: {
+              style: {
+                colors: "#616161",
+                fontSize: "12px",
+                fontFamily: "inherit",
+                fontWeight: 400,
+              },
+            },
+            categories: [
+              "Total Asset",
+              "Available Asset",
+              "Submitted Asset",
+              "Leased Asset",
+              "Returned Asset",
+              "Broken Asset",
+              "Missing Asset",
+              "Maintenance Asset",
+            ],
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: "#616161",
+                fontSize: "12px",
+                fontFamily: "inherit",
+                fontWeight: 400,
+              },
+            },
+          },
+          grid: {
+            show: true,
+            borderColor: "#dddddd",
+            strokeDashArray: 5,
+            xaxis: {
+              lines: {
+                show: true,
+              },
+            },
+            padding: {
+              top: 5,
+              right: 20,
+            },
+          },
+          fill: {
+            opacity: 0.8,
+          },
+          tooltip: {
+            theme: "dark",
+          },
+        },
+    };
+    
+    const pieChart = {
+        type: "pie",
+        width: 300,
+        height: 297,
+        series: filteredSeriesData,
+        options: {
+          chart: {
+            toolbar: {
+              show: false,
+            },
+          },
+          title: {
+            show: "",
+          },
+          labels: [
+            "Total Asset",
+            "Available Asset",
+            "Submitted Asset",
+            "Leased Asset",
+            "Returned Asset",
+            "Broken Asset",
+            "Missing Asset",
+            "Maintenance Asset",
+          ],
+          dataLabels: {
+            enabled: false,
+          },
+          colors: ["#E69500", "#4D4D4D", "#808080", "#008066", "#008040", "#E68AFF", "#E64C4C", "#336699"],
+          legend: {
+            show: false,
+          },
+        },
+    };
+
     return (
         <>
             <div className='p-2'>
-                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
+                <div className='bg-gray-800 mb-8 rounded-2xl p-4 shadow'>
                     <h2 className='text-white'>Welcome, Dashboard page :)</h2>
                 </div>
-                <div className='bg-white p-5'>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
+                <Card className='rounded-xl' floated={false} shadow={false} color="transparent">
+                    <CardHeader
+                        floated={false}
+                        shadow={false}
+                        color="transparent"
+                        className="m-0 flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+                    >
+                        <div>
+                            <Typography variant="h6" color="blue-gray">
+                                Dashboard & Statistic
+                            </Typography>
+                            <Typography
+                                variant="small"
+                                color="gray"
+                                className="max-w-sm font-normal"
+                            >
+                                Visuallization of the data into Card, Bar Chart, and Pie Chart.
+                            </Typography>
+                        </div>
+                    </CardHeader>
+                    <Card className="mt-4 p-5 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2">
                         <Link to='/listasset'>
                             <Popover
                                 open={popover1}
@@ -90,7 +237,7 @@ const Dashboard = () => {
                                         </div>
                                         <div className="dashboard-text ml-5">
                                             <div className="dashboard-value text-2xl font-bold">{DashboardInfo.total_assets}</div>
-                                            <div className="dashboard-label text-[#666] text-sm">Jumlah Asset</div>
+                                            <div className="dashboard-label text-[#666] text-sm">Total Asset</div>
                                         </div>
                                     </div>
                                 </PopoverHandler>
@@ -113,7 +260,7 @@ const Dashboard = () => {
                                         </div>
                                         <div className="dashboard-text ml-5">
                                             <div className="dashboard-value text-2xl font-bold">{DashboardInfo.available}</div>
-                                            <div className="dashboard-label text-[#666] text-sm">Asset Tersedia</div>
+                                            <div className="dashboard-label text-[#666] text-sm">Available Asset</div>
                                         </div>
                                     </div>
                                 </PopoverHandler>
@@ -136,7 +283,7 @@ const Dashboard = () => {
                                         </div>
                                         <div className="dashboard-text ml-5">
                                             <div className="dashboard-value text-2xl font-bold">{onRequest}</div>
-                                            <div className="dashboard-label text-[#666] text-sm">Asset Diajukan</div>
+                                            <div className="dashboard-label text-[#666] text-sm">Submitted Asset</div>
                                         </div>
                                     </div>
                                 </PopoverHandler>
@@ -159,7 +306,7 @@ const Dashboard = () => {
                                         </div>
                                         <div className="dashboard-text ml-5">
                                             <div className="dashboard-value text-2xl font-bold">{inLoans}</div>
-                                            <div className="dashboard-label text-[#666] text-sm">Asset Dipinjam</div>
+                                            <div className="dashboard-label text-[#666] text-sm">Leased Asset</div>
                                         </div>
                                     </div>
                                 </PopoverHandler>
@@ -182,7 +329,7 @@ const Dashboard = () => {
                                         </div>
                                         <div className="dashboard-text ml-5">
                                             <div className="dashboard-value text-2xl font-bold">{DashboardInfo.returning}</div>
-                                            <div className="dashboard-label text-[#666] text-sm">Asset Dikembalikan</div>
+                                            <div className="dashboard-label text-[#666] text-sm">Returned Asset</div>
                                         </div>
                                     </div>
                                 </PopoverHandler>
@@ -220,8 +367,16 @@ const Dashboard = () => {
                                 <div className="dashboard-label text-[#666] text-sm">Maintenance Asset</div>
                             </div>
                         </div>
+                    </Card>
+                    <div className='grid md:grid-cols-1 xl:grid-cols-2 gap-1 mt-1'>
+                        <Card className='px-2 pb-0'>
+                            <Chart {...barChart} />
+                        </Card>
+                        <Card className='grid place-items-center'>
+                            <Chart {...pieChart} />
+                        </Card>
                     </div>
-                </div>
+                </Card>
                 
             </div>
             

@@ -67,7 +67,7 @@ class LeaseTicket(Resource):
                         lmd.execute('INSERT INTO ticketingadmin (idticket, email, status) values (%s, %s, %s)', (idticket, admin1, 0))
                         db.commit()
 
-                        message = Message(f'Peminjaman Barang LMD', sender='nakatsuuchiha@gmail.com', recipients=[admin1])
+                        message = Message(f'Peminjaman Barang LMD', sender='admin.asset@lintasmediadanawa.com', recipients=[admin1])
                         message.body = f'Ticket Number {idticket}\n' \
                                        f'Atas Nama {name} ingin meminjam barang {assetname}\n' \
                                         'Klick Link untuk tindak/informasi lebih lanjut: https://asset.lintasmediadanawa.com:8443/submitted'
@@ -110,23 +110,31 @@ class LeaseSubmited(Resource):
                 cekadmin = lmd.fetchall()
 
                 ticketingadmin_list = []
-                for row in cekadmin:
-                    ids, idticket, username, status = row
-                    ticketingadmin_list.append({
-                        'id': ids,
-                        'idticket': idticket,
-                        'username': username,
-                        'status': status
-                    })
+                if cekadmin:
+                    for row in cekadmin:
+                        ids, idticket, username, status = row
+                        ticketingadmin_list.append({
+                            'id': ids,
+                            'idticket': idticket,
+                            'username': username,
+                            'status': status
+                        })
+                else:
+                    return jsonify({'message': 'No data found for the given email', 'ticketingadmin_list': []})
 
                 ticket_list = []
 
                 idtickets = [admin_row['idticket'] for admin_row in ticketingadmin_list]
                 placeholders = ', '.join(['%s'] * len(idtickets))
-                query = 'SELECT * FROM ticket ' \
-                        'INNER JOIN ticketingadmin ON ticket.idticket = ticketingadmin.idticket ' \
-                        'INNER JOIN assets ON ticket.idasset = assets.id ' \
-                        'WHERE ticket.idticket IN ({}) AND ticket.status = 0 AND ticketingadmin.status = 0 AND ticketingadmin.email = %s'.format(placeholders)
+                query = '''
+                    SELECT * FROM ticket
+                    INNER JOIN ticketingadmin ON ticket.idticket = ticketingadmin.idticket
+                    INNER JOIN assets ON ticket.idasset = assets.id
+                    WHERE ticket.idticket IN ({}) 
+                    AND ticket.status = 0 
+                    AND ticketingadmin.status = 0 
+                    AND ticketingadmin.email = %s
+                '''.format(placeholders)
 
                 params = idtickets + [email]
                 lmd.execute(query, params)
@@ -211,7 +219,7 @@ class TicketApprove(Resource):
                                     admin2_email = result
                                     lmd.execute('UPDATE ticketingadmin SET status = %s WHERE email = %s and idticket = %s', (0, admin2_email, SelectedTicketingAdmin,))
                                     db.commit()
-                                    message = Message(f'Peminjaman Barang LMD', sender='nakatsuuchiha@gmail.com', recipients=[admin2_email])
+                                    message = Message(f'Peminjaman Barang LMD', sender='admin.asset@lintasmediadanawa.com', recipients=[admin2_email])
                                     message.body = f'Ticket Number {selectedTicketId}\n' \
                                                    f'Atas Nama {data[3]} ingin meminjam barang {assetname}\n' \
                                                    f'Admin Pertama atas nama {usernameadmin1}({fetch_ticketingadmin}) telah menyetujui Pengajuan ini\n' \
@@ -234,7 +242,7 @@ class TicketApprove(Resource):
                                     nameasset = lmd.fetchone()[0]
                                     lmd.execute('INSERT INTO loandata (idticket, idasset, nameasset, leasedate, returndate, username, email, status, deleted) VALUES (%s, %s, %s, %s ,%s ,%s, %s ,%s ,%s)', (selectedTicketId, data[0], nameasset, data[1], data[2], data[3], data[4], '0', '0'))
                                     db.commit()
-                                    message = Message(f'Peminjaman Barang LMD (Approved)', sender='nakatsuuchiha@gmail.com', recipients=[data[4]])
+                                    message = Message(f'Peminjaman Barang LMD (Approved)', sender='admin.asset@lintasmediadanawa.com', recipients=[data[4]])
                                     message.body = f'Ticket Number {selectedTicketId}\n' \
                                                    f'Meminjam Barang {assetname}\n' \
                                                    f'Admin Pertama atas nama {usernameadmin1} ({fetch_ticketingadmin}) dan Admin Kedua atas nama {usernameadmin2} ({fetch_ticketingadmin_2})telah menyetujui Pengajuan ini\n'

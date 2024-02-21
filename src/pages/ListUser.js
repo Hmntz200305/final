@@ -1,6 +1,4 @@
 import React, { useEffect, useState} from 'react'
-import DataTable from 'react-data-table-component';
-import DataTableExtensions from 'react-data-table-component-extensions';
 import 'react-data-table-component-extensions/dist/index.css';
 import { faPenToSquare, faTrash, faUserShield, faUser, } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
@@ -8,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Input, Menu, MenuList, MenuItem, MenuHandler, Button } from "@material-tailwind/react";
 import Modal from 'react-modal';
 import { useAuth } from '../AuthContext';
+import { MaterialReactTable, useMaterialReactTable, createMRTColumnHelper } from 'material-react-table';
 
 const ListUser = () => {
 
@@ -153,47 +152,110 @@ const ListUser = () => {
         }
       };
 
+    const columnHelper = createMRTColumnHelper();
     const columns = [
-        {
-            name: 'No',
-            selector: (row) => row.row,
+        columnHelper.accessor('row', {
+          header: 'No',
+          size: 150,
+        }),
+        columnHelper.accessor('username', {
+          header: 'Username',
+          size: 150,
+        }),
+        columnHelper.accessor('email', {
+          header: 'Email',
+          size: 150,
+        }),
+        columnHelper.accessor('role', {
+          header: 'Role',
+          size: 150,
+        }),
+        columnHelper.accessor('created_at', {
+          header: 'Created Date',
+          size: 150,
+        }),
+        columnHelper.accessor('action', {
+          header: 'Action',
+          size: 100,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white'>
+                <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openModalEdit(row.original)}>
+                    <FontAwesomeIcon icon={faPenToSquare} />
+                </button>
+                <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openModalDelete(row.original.no)}>
+                    <FontAwesomeIcon icon={faTrash} />
+                </button>
+            </div>
+          ),
+        }),
+      ];
+
+    const tableUser = useMaterialReactTable({
+        columns,
+        data: ManageUserData || [],
+        enableFullScreenToggle: false,
+        positionToolbarAlertBanner: 'none',
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
             },
-            {
-            name: 'Username',
-            selector: (row) => row.username,
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
             },
-            {
-            name: 'Email',
-            selector: (row) => row.email,
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+              borderRadius: '0',
+              border: '1px solid #ffffff',
             },
-            {
-            name: 'Role',
-            selector: (row) => row.role,
+        },
+        muiTableBodyProps: {
+            sx: {
+              '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+              },
             },
-            {
-            name: 'Created Date',
-            selector: (row) => row.created_at,
+        },
+        muiTopToolbarProps: {
+            sx: {
+              backgroundColor: '#1f2937',
             },
-            {
-            name: 'Action',
-            cell: (row) => (
-                <div className='text-white'>
-                    <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openModalEdit(row)}>
-                        <FontAwesomeIcon icon={faPenToSquare} />
-                    </button>
-                    <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openModalDelete(row.no)}>
-                        <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                </div>
-                )
-            }
-    ]
+        },
+        muiBottomToolbarProps: {
+            sx: {
+                backgroundColor: '#1f2937',
+            },
+        },
+        muiTableHeadCellProps: {
+            sx: {
+              fontWeight: 'bold',
+              fontSize: '14px',
+            },
+        },
+        muiSearchTextFieldProps: {
+          size: 'small',
+          variant: 'outlined',
+        },
+        paginationDisplayMode: 'pages',
+        muiPaginationProps: {
+            color: 'standard',
+            rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+            pageSize: 5,
+            shape: 'rounded',
+            variant: 'outlined',
+        },
+    });
 
     return (
         <> 
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Welcome, List of User page :)</h2>
+                    <h2 className='text-white'>Welcome, List of User hehe :)</h2>
                 </div>
             </div>
 
@@ -427,24 +489,9 @@ const ListUser = () => {
                 )}
 
                 <div>
-                    <DataTableExtensions
-                    columns={columns}
-                    data={ManageUserData}
-                    fileName='hehe'
-                    filter
-                    print={false}
-                    export={false}
-                    exportHeaders={false}
-                    filterPlaceholder='Filter Data'
-                    >
-                    <DataTable
-                        noHeader
-                        defaultSortField='no'
-                        defaultSortAsc={false}
-                        pagination
-                        highlightOnHover
+                    <MaterialReactTable
+                        table={tableUser}
                     />
-                    </DataTableExtensions>
                 </div>
             </div>
         </>

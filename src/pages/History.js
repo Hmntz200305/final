@@ -1,12 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
-import DataTable from 'react-data-table-component';
-import { faFileCsv, faFilePdf } from '@fortawesome/free-solid-svg-icons';
-import 'react-data-table-component-extensions/dist/index.css';
+import { faEllipsis, faFileCsv, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../AuthContext';
-import { MaterialReactTable, createMRTColumnHelper, } from 'material-react-table';
+import { MaterialReactTable, createMRTColumnHelper, useMaterialReactTable } from 'material-react-table';
 import { mkConfig, generateCsv, download } from 'export-to-csv';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -16,6 +13,137 @@ Modal.setAppElement('#root');
 const History = () => {
 
     const LogContent = () => {
+
+        const columnLog = [
+            columnHelper.accessor('no', {
+                header: 'No',
+                size: 150,
+            }),
+            columnHelper.accessor('idticket', {
+                header: 'ID Ticket',
+                size: 150,
+            }),
+            columnHelper.accessor('asset', {
+                header: 'ID Asset',
+                size: 150,
+            }),
+            columnHelper.accessor('name', {
+                header: 'Name',
+                size: 150,
+            }),
+            columnHelper.accessor('leasedate', {
+                header: 'Lease Date',
+                size: 150,
+            }),
+            columnHelper.accessor('returndate', {
+                header: 'Return Date',
+                size: 150,
+            }),
+            columnHelper.accessor('location', {
+                header: 'Location',
+                size: 150,
+            }),
+            columnHelper.accessor('note', {
+                header: 'Note',
+                size: 250,
+            }),
+            columnHelper.accessor('email', {
+                header: 'Email',
+                size: 150,
+            }),
+            columnHelper.accessor('status', {
+                header: 'Status',
+                size: 150,
+            }),
+            columnHelper.accessor('admin1', {
+                header: 'Approver #1',
+                size: 150,
+            }),
+            columnHelper.accessor('admin2', {
+                header: 'Approver #2',
+                size: 150,
+            }),
+            columnHelper.accessor('more', {
+                header: 'More Detail',
+                size: 50,
+                enableSorting: false,
+                enableColumnFilter: false,
+                Cell: ({row}) => (
+                    <div className='text-white flex items-center justify-center cursor-pointer'>
+                        <button
+                        className='bg-gray-800 py-[1px] px-3 rounded-xl'
+                        onClick={() => openMoreDetailHandler(row.original)}
+                        >
+                            <FontAwesomeIcon icon={faEllipsis} size='xl'/>
+                        </button>
+                    </div>
+                  ),
+                }),
+            ];
+    
+        const tableLog = useMaterialReactTable({
+            columns: columnLog,
+            data: HistoryTicket || [],
+            enableRowSelection: true,
+            enableFullScreenToggle: false,
+            positionToolbarAlertBanner: 'none',
+            displayColumnDefOptions: {
+                'mrt-row-select': {
+                    size: 20,
+                    grow: false,
+                },
+                'mrt-row-numbers': {
+                    size: 20,
+                    grow: true,
+                },
+            },
+            muiTablePaperProps: {
+                elevation: 0,
+                sx: {
+                    borderRadius: '0',
+                    border: '1px solid #ffffff',
+                },
+            },
+            muiTableBodyProps: {
+                sx: {
+                    '& tr:nth-of-type(odd) > td': {
+                    backgroundColor: '#f5f5f5',
+                    },
+                },
+            },
+            muiTopToolbarProps: {
+                sx: {
+                    backgroundColor: '#1f2937',
+                },
+            },
+            muiBottomToolbarProps: {
+                sx: {
+                    backgroundColor: '#1f2937',
+                },
+            },
+            muiTableHeadCellProps: {
+                sx: {
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                },
+            },
+            muiSearchTextFieldProps: {
+                size: 'small',
+                variant: 'outlined',
+            },
+            paginationDisplayMode: 'pages',
+            muiPaginationProps: {
+                color: 'standard',
+                rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+                pageSize: 5,
+                shape: 'rounded',
+                variant: 'outlined',
+            },
+            renderTopToolbarCustomActions: ({ table }) => {
+                tableRef.current = table;
+                return null; 
+            },
+        });
 
         const handleExportCsvLog = (rows) => {
             if (rows.length === 0) {
@@ -44,6 +172,7 @@ const History = () => {
               fieldSeparator: ',',
               decimalSeparator: '.',
               useKeysAsHeaders: true,
+              filename: 'History Log'
             });
           
             const csv = generateCsv(csvConfig)(rowData);
@@ -68,15 +197,15 @@ const History = () => {
               body: tableData,
             });
           
-            doc.save('mrt-pdf-example.pdf');
+            doc.save('History Log.pdf');
         };
         
 
         return (
             <div className='flex flex-col p-2 gap-1'>
-                <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
+                <p className='mb-4'>Please select the desired export format:</p>
                 <div className='flex space-x-[1px]'>
-                    <Button className=' cursor-default'>
+                    <Button className='bg-gray-800 cursor-default'>
                         <FontAwesomeIcon icon={faFileCsv} size='xl' />
                     </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
@@ -104,7 +233,7 @@ const History = () => {
                     </div>
                 </div>
                 <div className='flex space-x-[1px]'>
-                    <Button className=' cursor-default'>
+                    <Button className='bg-gray-800 cursor-default'>
                         <FontAwesomeIcon icon={faFilePdf} size='xl' />
                     </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
@@ -133,20 +262,7 @@ const History = () => {
                 </div>
                 <div className='mt-4'>
                     <MaterialReactTable 
-                        columns={columnsNew}
-                        data={HistoryTicket}
-                        enableRowSelection={true}
-                        enableDensityToggle={false}
-                        initialState={{density: 'compact'}}
-                        enableFullScreenToggle={false}
-                        enableClickToCopy={false}
-                        columnFilterDisplayMode= 'popover'
-                        paginationDisplayMode= 'pages'
-                        positionToolbarAlertBanner= 'bottom'
-                        renderTopToolbarCustomActions= {({ table }) => { 
-                            tableRef.current = table;
-                            return null; 
-                        }}
+                        table={tableLog}
                     />
                 </div>
             </div>
@@ -154,6 +270,125 @@ const History = () => {
     };
 
     const PeminjamanContent = () => {
+
+        const columnPeminjaman = [
+            columnHelper.accessor('no', {
+                header: 'No',
+                size: 150,
+            }),
+            columnHelper.accessor('idticket', {
+                header: 'ID Ticket',
+                size: 150,
+            }),
+            columnHelper.accessor('asset', {
+                header: 'ID Asset',
+                size: 150,
+            }),
+            columnHelper.accessor('assetname', {
+                header: 'Name',
+                size: 150,
+            }),
+            columnHelper.accessor('leasedate', {
+                header: 'Lease Date',
+                size: 150,
+            }),
+            columnHelper.accessor('returndate', {
+                header: 'Return Date',
+                size: 150,
+            }),
+            columnHelper.accessor('name', {
+                header: 'Username',
+                size: 150,
+            }),
+            columnHelper.accessor('email', {
+                header: 'Email',
+                size: 150,
+            }),
+            columnHelper.accessor('status', {
+                header: 'Status',
+                size: 150,
+            }),
+            columnHelper.accessor('more', {
+                header: 'More Detail',
+                size: 50,
+                enableSorting: false,
+                enableColumnFilter: false,
+                Cell: ({row}) => (
+                    <div className='text-white flex items-center justify-center cursor-pointer'>
+                        <button
+                        className='bg-gray-800 py-[1px] px-3 rounded-xl'
+                        onClick={() => openMoreDetailHandler(row.original)}
+                        >
+                        <FontAwesomeIcon icon={faEllipsis} size='xl'/>
+                        </button>
+                    </div>
+                    ),
+                }),
+            ];
+    
+        const tablePeminjaman = useMaterialReactTable({
+            columns: columnPeminjaman,
+            data: HistoryLoanData || [],
+            enableRowSelection: true,
+            enableFullScreenToggle: false,
+            positionToolbarAlertBanner: 'none',
+            displayColumnDefOptions: {
+                'mrt-row-select': {
+                    size: 20,
+                    grow: false,
+                },
+                'mrt-row-numbers': {
+                    size: 20,
+                    grow: true,
+                },
+            },
+            muiTablePaperProps: {
+                elevation: 0,
+                sx: {
+                    borderRadius: '0',
+                    border: '1px solid #ffffff',
+                },
+            },
+            muiTableBodyProps: {
+                sx: {
+                    '& tr:nth-of-type(odd) > td': {
+                    backgroundColor: '#f5f5f5',
+                    },
+                },
+            },
+            muiTopToolbarProps: {
+                sx: {
+                    backgroundColor: '#1f2937',
+                },
+            },
+            muiBottomToolbarProps: {
+                sx: {
+                    backgroundColor: '#1f2937',
+                },
+            },
+            muiTableHeadCellProps: {
+                sx: {
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                },
+            },
+            muiSearchTextFieldProps: {
+                size: 'small',
+                variant: 'outlined',
+            },
+            paginationDisplayMode: 'pages',
+            muiPaginationProps: {
+                color: 'standard',
+                rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+                pageSize: 5,
+                shape: 'rounded',
+                variant: 'outlined',
+            },
+            renderTopToolbarCustomActions: ({ table }) => {
+                tableRef.current = table;
+                return null; 
+            },
+        });
 
         const handleExportCsvPeminjaman = (rows) => {
             if (rows.length === 0) {
@@ -179,6 +414,7 @@ const History = () => {
               fieldSeparator: ',',
               decimalSeparator: '.',
               useKeysAsHeaders: true,
+              filename: 'History Peminjaman'
             });
           
             const csv = generateCsv(csvConfig)(rowData);
@@ -203,14 +439,14 @@ const History = () => {
               body: tableData,
             });
           
-            doc.save('mrt-pdf-example.pdf');
+            doc.save('History Peminjaman.pdf');
         };
 
         return (
             <div className='flex flex-col p-2 gap-1'>
-                <p className='mb-4'>Silahkan pilih ingin mengexport dengan apa </p>
+                <p className='mb-4'>Please select the desired export format: </p>
                 <div className='flex space-x-[1px]'>
-                    <Button className=' cursor-default'>
+                    <Button className='bg-gray-800 cursor-default'>
                         <FontAwesomeIcon icon={faFileCsv} size='xl' />
                     </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
@@ -238,7 +474,7 @@ const History = () => {
                     </div>
                 </div>
                 <div className='flex space-x-[1px]'>
-                    <Button className=' cursor-default'>
+                    <Button className='bg-gray-800 cursor-default'>
                         <FontAwesomeIcon icon={faFilePdf} size='xl' />
                     </Button>
                     <div className='flex flex-grow items-center border rounded border-gray-800'>
@@ -267,20 +503,7 @@ const History = () => {
                 </div>
                 <div className='mt-4'>
                     <MaterialReactTable 
-                        columns={Peminjaman}
-                        data={HistoryLoanData}
-                        enableRowSelection={true}
-                        enableDensityToggle={false}
-                        initialState={{density: 'compact'}}
-                        enableClickToCopy={false}
-                        enableFullScreenToggle={false}
-                        columnFilterDisplayMode= 'popover'
-                        paginationDisplayMode= 'pages'
-                        positionToolbarAlertBanner= 'bottom'
-                        renderTopToolbarCustomActions= {({ table }) => { 
-                            tableRef.current = table;
-                            return null; 
-                        }}
+                        table={tablePeminjaman}
                     />
                 </div>
             </div>
@@ -342,7 +565,6 @@ const History = () => {
         },
     ];
 
-    // Modal
     const [showMoreDetail, setShowMoreDetail] = useState(false);
 
     const openMoreDetailHandler = (row) => {
@@ -352,189 +574,96 @@ const History = () => {
     const closeMoreDetailHandler = (row) => {
         setShowMoreDetail(false)
     }
-
       
     const columnHelper = createMRTColumnHelper();
-
-        const columnsNew = [
-        columnHelper.accessor('no', {
-            header: 'No',
-            size: 40,
-        }),
-        columnHelper.accessor('idticket', {
-            header: 'ID Ticket',
-            size: 120,
-        }),
+    const columnMore = [
         columnHelper.accessor('asset', {
             header: 'ID Asset',
-            size: 120,
-        }),
-        columnHelper.accessor('name', {
-            header: 'Name',
-            size: 120,
-        }),
-        columnHelper.accessor('leasedate', {
-            header: 'Lease Date',
-            size: 120,
-        }),
-        columnHelper.accessor('returndate', {
-            header: 'Return Date',
-            size: 120,
-        }),
-        columnHelper.accessor('location', {
-            header: 'Location',
-            size: 120,
-        }),
-        columnHelper.accessor('note', {
-            header: 'Note',
-            size: 120,
-        }),
-        columnHelper.accessor('email', {
-            header: 'Email',
-            size: 120,
-        }),
-        columnHelper.accessor('status', {
-            header: 'Status',
-            size: 120,
-        }),
-        columnHelper.accessor('admin1', {
-            header: 'Admin #1',
-            size: 120,
-        }),
-        columnHelper.accessor('admin2', {
-            header: 'Admin #2',
-            size: 120,
-        }),
-        columnHelper.accessor('more', {
-            header: 'More Detail',
-            size: 120,
-            enableSorting: false,
-            enableColumnFilter: false,
-            Cell: ({row}) => (
-                <div className='text-white flex items-center justify-center cursor-pointer'>
-                    <button
-                    className='bg-gray-800 p-1 rounded-lg'
-                    onClick={() => openMoreDetailHandler(row.original)}
-                    >
-                        <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
-                    </button>
-                </div>
-              ),
-            }),
-        ];
-
-        const Peminjaman = [
-        columnHelper.accessor('no', {
-            header: 'No',
-            size: 40,
-        }),
-        columnHelper.accessor('idticket', {
-            header: 'ID Ticket',
-            size: 120,
-        }),
-        columnHelper.accessor('asset', {
-            header: 'ID Asset',
-            size: 120,
+            size: 150,
         }),
         columnHelper.accessor('assetname', {
             header: 'Name',
-            size: 120,
+            size: 150,
         }),
-        columnHelper.accessor('leasedate', {
-            header: 'Lease Date',
-            size: 120,
+        columnHelper.accessor('assetdescription', {
+            header: 'Description',
+            size: 250,
         }),
-        columnHelper.accessor('returndate', {
-            header: 'Return Date',
-            size: 120,
+        columnHelper.accessor('assetbrand', {
+            header: 'Brand',
+            size: 150,
         }),
-        columnHelper.accessor('name', {
-            header: 'Username',
-            size: 120,
+        columnHelper.accessor('assetmodel', {
+            header: 'Model',
+            size: 150,
         }),
-        columnHelper.accessor('email', {
-            header: 'Email',
-            size: 120,
-        }),
-        columnHelper.accessor('status', {
+        columnHelper.accessor('assetstatus', {
             header: 'Status',
-            size: 120,
+            size: 150,
         }),
-        columnHelper.accessor('more', {
-            header: 'More Detail',
-            size: 120,
-            enableSorting: false,
-            enableColumnFilter: false,
-            Cell: ({row}) => (
-                <div className='text-white flex items-center justify-center cursor-pointer'>
-                    <button
-                    className='bg-gray-800 p-1 rounded-lg'
-                    onClick={() => openMoreDetailHandler(row.original)}
-                    >
-                    <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
-                    </button>
+        columnHelper.accessor('assetlocation', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('assetcategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsn', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        columnHelper.accessor('image_path', {
+            header: 'Photo',
+            size: 100,
+            Cell: ({ row }) => (
+                <div className='cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105'>
+                  <img src={row.original.assetphoto} className='rounded-lg shadow p-0.5 shadow-black' />
                 </div>
-                ),
-            }),
+            ),
+        }),
         ];
 
-    const HistoryMore = [
-        {
-            name: 'ID Asset',
-            selector: (row) => row.asset,
+    const tableMore = useMaterialReactTable({
+        columns: columnMore,
+        data: selectedAssetDetails || [],
+        enableTopToolbar: false,
+        enableBottomToolbar: false,
+        enableColumnActions: false,
+        enableSorting: false,
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
             },
-            {
-            name: 'Name',
-            selector: (row) => row.assetname,
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
             },
-            {
-            name: 'Description',
-            selector: (row) => row.assetdescription,
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+                borderRadius: '0',
+                border: '1px solid #ffffff',
             },
-            {
-            name: 'Brand',
-            selector: (row) => row.assetbrand,
+        },
+        muiTableBodyProps: {
+            sx: {
+                '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+                },
             },
-            {
-            name: 'Model',
-            selector: (row) => row.assetmodel,
-            },
-            {
-            name: 'Status',
-            selector: (row) => row.assetstatus,
-            },
-            {
-            name: 'Location',
-            selector: (row) => row.assetlocation,
-            },
-            {
-            name: 'Category',
-            selector: (row) => row.assetcategory,
-            },
-            {
-            name: 'SN',
-            selector: (row) => row.assetsn,
-            },
-            {
-            name: 'Photo',
-            cell: (row) => (
-                <div>
-                  <img src={row.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
-                </div>
-              ),
-            },
-    ]
+        },
+    });
 
     return (
         <>
             <div className='p-2'>
-                <div className='bg-gray-800 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di History page :)</h2>
+                <div className='bg-gray-800 rounded-2xl mb-8 p-4 shadow'>
+                    <h2 className='text-white'>Welcome, History page:)</h2>
                 </div>
-            </div>
-            
-            <div className='p-2'>
-                <div className='bg-white rounded mt-6 '>
+                <div className='bg-white rounded'>
                     <div className='flex justify-center'>
                         <h1 className="text-2xl font-semibold mt-6">Select Menu</h1>
                     </div>
@@ -568,6 +697,7 @@ const History = () => {
                 </div>
             </div>
             
+            
             {isDesktopView && (
                 <Modal
                     isOpen={showMoreDetail}
@@ -578,13 +708,11 @@ const History = () => {
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset</h1>
-                            <DataTable
-                                columns={HistoryMore}
-                                data={selectedAssetDetails}
-                                highlightOnHover
+                            <p>The following is a complete asset detail</p>
+                            <MaterialReactTable 
+                                table={tableMore}
                             />
-                        <Button onClick={closeMoreDetailHandler} className=" mt-4">
+                        <Button onClick={closeMoreDetailHandler} className="bg-gray-800 mt-4">
                             Close
                         </Button>
                     </div>
@@ -600,13 +728,11 @@ const History = () => {
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset</h1>
-                            <DataTable
-                                columns={HistoryMore}
-                                data={selectedAssetDetails}
-                                highlightOnHover
+                    <p>The following is a complete asset detail</p>
+                            <MaterialReactTable 
+                                table={tableMore}
                             />
-                        <Button onClick={closeMoreDetailHandler} className=" mt-4">
+                        <Button onClick={closeMoreDetailHandler} className="bg-gray-800 mt-4">
                             Close
                         </Button>
                     </div>

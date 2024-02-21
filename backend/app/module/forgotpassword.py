@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from app.config_flask import SECRET_KEY, check_whitelist
 from app.config_mail import mail  
 from flask_mail import Message
-from flask import url_for
+from flask import url_for, redirect
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 import hashlib
 
@@ -35,7 +35,7 @@ class ForgotPassword(Resource):
                 'password': md5password,
             }
             token = key.dumps(user_info)
-            msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
+            msg = Message('Verifikasi Email', sender='admin.asset@lintasmediadanawa.com', recipients=[email])
             verification_url = url_for('verifyemailforgotpw', token=token, _external=True)
             msg.body = f'Klik tautan ini untuk verifikasi Reset Password Anda: {verification_url}'
             mail.send(msg)
@@ -63,7 +63,7 @@ class VerifyEmailForgotPw(Resource):
                 'password': password,
             }
             new_token = key.dumps(user_info)
-            msg = Message('Verifikasi Email', sender='your_email@example.com', recipients=[email])
+            msg = Message('Verifikasi Email', sender='admin.asset@lintasmediadanawa.com', recipients=[email])
             verification_url = url_for('VerifyEmail', token=new_token, _external=True)  # URL baru
             msg.body = f'Token lama telah kadaluwarsa. Klik tautan ini untuk verifikasi Reset Password Anda: {verification_url}'
             mail.send(msg)

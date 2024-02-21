@@ -28,6 +28,13 @@ import ScanLease from './pages/ScanLease';
 import ScanCheck from './pages/ScanCheck';
 import TestListAsset from './TestListAsset';
 import TestLease from './TestLease';
+import TestHistory from './TestHistory';
+import TestReturn from './TestReturn';
+import TestSubmitted from './TestSubmitted';
+import TestQR from './TestQR';
+import TestScan from './TestScan';
+import TestReport from './TestReport';
+import TestUser from './TestUser';
 import { AuthProvider, useAuth } from './AuthContext';
 import { Bounce,  ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -187,7 +194,7 @@ const Home = () =>  {
       {loggedIn ? (
         <div className={`flex fixed z-[9997] text-white items-center w-full justify-between bg-gray-800 h-[60px] px-7 border-b ${openDrawer ? 'border-[#606060]' : 'border-[#efefef]'}`}>
           <div className='flex justify-between items-center'>
-            <Link to='https://asset.lintasmediadanawa.com'>
+            <Link to='https://asset.lintasmediadanawa.com:2096'>
               <div className='logo'>
                 <img src={lmd} alt='logohe' className='w-[150px] h-auto flex m-auto items-center' />
               </div>
@@ -935,6 +942,34 @@ const Home = () =>  {
               <Route 
                 path="/testlease" 
                 element ={<TestLease />}  
+              />
+              <Route 
+                path="/testhistory" 
+                element ={<TestHistory />}  
+              />
+              <Route 
+                path="/testreturn" 
+                element ={<TestReturn />}  
+              />
+              <Route 
+                path="/testsubmitted" 
+                element ={<TestSubmitted />}  
+              />
+              <Route 
+                path="/testqr" 
+                element ={<TestQR />}  
+              />
+              <Route 
+                path="/testscan" 
+                element ={<TestScan />}  
+              />
+              <Route 
+                path="/testreport" 
+                element ={<TestReport />}  
+              />
+              <Route 
+                path="/testuser" 
+                element ={<TestUser />}  
               />
             </Routes>
         </div>

@@ -201,7 +201,7 @@ class LeaseTicketScanner(Resource):
                             assetname = lmd.fetchone()[0]
                             lmd.execute('INSERT INTO ticketingadmin (idticket, email, status) values (%s, %s, %s)', (idticket, admin1, 0))
                             db.commit()
-                            message = Message(f'Peminjaman Barang LMD', sender='nakatsuuchiha@gmail.com', recipients=[admin1])
+                            message = Message(f'Peminjaman Barang LMD', sender='admin.asset@lintasmediadanawa.com', recipients=[admin1])
                             message.body = f'Ticket Number {idticket}\n' \
                                            f'Atas Nama {name} ingin meminjam barang {assetname}\n' \
                                             'Klick Link untuk tindak/informasi lebih lanjut: https://asset.lintasmediadanawa.com/submitted'

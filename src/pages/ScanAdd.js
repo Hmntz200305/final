@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QrScanner from 'qr-scanner';
 import { Button, Select, Option } from '@material-tailwind/react';
-import DataTable from 'react-data-table-component';
+import { MaterialReactTable, useMaterialReactTable, createMRTColumnHelper } from 'material-react-table';
 import 'react-data-table-component-extensions/dist/index.css';
 import { useAuth } from '../AuthContext';
 
@@ -102,54 +102,6 @@ const ScanAdd = () => {
     setShowTable(false);
   };
 
-  const Columns = [
-    {
-      name: 'ID Asset',
-      selector: row => row['AssetID'],
-      export: true
-    },
-    {
-      name: 'Name',
-      selector: row => row['AssetName'],
-      export: true
-    },
-    {
-      name: 'Description',
-      selector: row => row['AssetDesc'],
-      export: true
-    },
-    {
-      name: 'Brand',
-      selector: row => row['AssetBrand'],
-      export: true
-    },
-    {
-      name: 'Model',
-      selector: row => row['AssetModel'],
-      export: true
-    },
-    {
-      name: 'Status',
-      selector: row => row['AssetStatus'],
-      export: true
-    },
-    {
-      name: 'Location',
-      selector: row => row['AssetLocation'],
-      export: true
-    },
-    {
-      name: 'Category',
-      selector: row => row['AssetCategory'],
-      export: true
-    },
-    {
-      name: 'SN',
-      selector: row => row['AssetSN'],
-      export: true
-    },
-  ];
-
   const handleSubmit = async () => {
     const apiUrl = 'https://asset.lintasmediadanawa.com:8443/api/qrscanner';
     const dataToSend = scannedData.length > 0 ? scannedData[0] : null;
@@ -187,6 +139,105 @@ const ScanAdd = () => {
     }
   };
 
+    const columnHelper = createMRTColumnHelper();
+    const columns = [
+        columnHelper.accessor('AssetID', {
+            header: 'ID Asset',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetName', {
+            header: 'Name',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetDesc', {
+            header: 'Description',
+            size: 250,
+        }),
+        columnHelper.accessor('AssetBrand', {
+            header: 'Brand',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetModel', {
+            header: 'Model',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetStatus', {
+            header: 'Status',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetLocation', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetCategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('AssetSN', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        ];
+
+        const tableScan = useMaterialReactTable({
+            columns,
+            data: scannedData || [],
+            enableFullScreenToggle: false,
+            positionToolbarAlertBanner: 'none',
+            displayColumnDefOptions: {
+                'mrt-row-select': {
+                    size: 20,
+                    grow: false,
+                },
+                'mrt-row-numbers': {
+                    size: 20,
+                    grow: true,
+                },
+            },
+            muiTablePaperProps: {
+                elevation: 0,
+                sx: {
+                  borderRadius: '0',
+                  border: '1px solid #ffffff',
+                },
+            },
+            muiTableBodyProps: {
+                sx: {
+                  '& tr:nth-of-type(odd) > td': {
+                    backgroundColor: '#f5f5f5',
+                  },
+                },
+            },
+            muiTopToolbarProps: {
+                sx: {
+                  backgroundColor: '#1f2937',
+                },
+            },
+            muiBottomToolbarProps: {
+                sx: {
+                    backgroundColor: '#1f2937',
+                },
+            },
+            muiTableHeadCellProps: {
+                sx: {
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                },
+            },
+            muiSearchTextFieldProps: {
+              size: 'small',
+              variant: 'outlined',
+            },
+            paginationDisplayMode: 'pages',
+            muiPaginationProps: {
+                color: 'standard',
+                rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+                pageSize: 5,
+                shape: 'rounded',
+                variant: 'outlined',
+            },
+          });
+
   return (
     <>
         <div className="p-2">
@@ -196,9 +247,9 @@ const ScanAdd = () => {
         </div>
         <div className='p-2'>
         {isScannerActive ? (
-          <Button onClick={handleToggleScanner}>Stop Scan</Button>
+          <Button className='bg-gray-800' onClick={handleToggleScanner}>Stop Scan</Button>
         ) : (
-          <Button onClick={handleToggleScanner}>{ShowTable ? 'Start Scan Again' : 'Start Scan'}</Button>
+          <Button className='bg-gray-800' onClick={handleToggleScanner}>{ShowTable ? 'Start Scan Again' : 'Start Scan'}</Button>
         )}
         </div>
         <div className={`${ShowTable ? 'hidden' : 'p-2 flex flex-col items-center justify-center'}`}>
@@ -220,17 +271,11 @@ const ScanAdd = () => {
             )} */}
             {ShowTable && (
               <>
-                <DataTable
-                  columns={Columns}
-                  data={scannedData || []}
-                  noHeader
-                  defaultSortField='no'
-                  defaultSortAsc={false}
-                  pagination
-                  highlightOnHover
+                <MaterialReactTable
+                    table={tableScan}
                 />
-                <div className='flex justify-end'>
-                  <Button onClick={handleSubmit} disabled={submitting}>
+                <div className='flex justify-end mt-2'>
+                  <Button className='bg-gray-800' onClick={handleSubmit} disabled={submitting}>
                     Submit
                   </Button>
                 </div>

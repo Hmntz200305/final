@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import DataTable from 'react-data-table-component';
-import 'react-data-table-component-extensions/dist/index.css';
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { MaterialReactTable, useMaterialReactTable, createMRTColumnHelper } from 'material-react-table';
+import { faCircleInfo, faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
 import { Button } from '@material-tailwind/react'
@@ -87,7 +86,7 @@ const Return = () => {
     };
 
     const handleRowDeselected = (row) => {
-        setselectedLoanID(selectedLoanID.filter((loan) => loan.id !== row.id));
+        setselectedLoanID(selectedLoanID.filter((loan) => loan.id !== row.original.id));
         console.log(selectedLoanID);
       };
 
@@ -134,128 +133,214 @@ const Return = () => {
       setShowModalAsset(false);
     };
 
-
-    const morecolumn = [
-      {
-          name: 'ID Asset',
-          selector: (row) => row.idasset,
-          },
-          {
-          name: 'Name',
-          selector: (row) => row.nameasset,
-          },
-          {
-          name: 'Description',
-          selector: (row) => row.assetsdesc,
-          },
-          {
-          name: 'Brand',
-          selector: (row) => row.assetsbrand,
-          },
-          {
-          name: 'Model',
-          selector: (row) => row.assetsmodel,
-          },
-          {
-          name: 'Status',
-          selector: (row) => row.assetsstatus,
-          },
-          {
-          name: 'Location',
-          selector: (row) => row.assetslocation,
-          },
-          {
-          name: 'Category',
-          selector: (row) => row.assetscategory,
-          },
-          {
-          name: 'SN',
-          selector: (row) => row.assetssn,
-          },
-          {
-          name: 'Photo',
-          cell: (row) => (
-              <div>
-                <img src={row.assetsphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
-              </div>
-            ),
-          },
-  ]
-
-    const moredata = [
-      { id: 'Asset 0001', name: 'Laptop', description: 'leptop gemink gada obat', brand: 'Asus', model: 'Vivobook', status: 'Available', location: 'LMD', category: 'Laptop', sn: '123123123123', photo: '', action: '' },
-  ]
-
-    const columns = [
-        {
-            name: 'No',
-            selector: (row) => row.row,
-            sortable: true,
-            export: true,
-        },
-        {
-            name: 'ID Asset',
-            selector: (row) => row.idasset,
-            export: true,
-        },
-        {
-            name: 'Name',
-            selector: (row) => row.nameasset,
-            export: true,
-        },
-        {
-            name: 'Lease Date',
-            selector: (row) => row.leasedate,
-            export: true,
-        },
-        {
-            name: 'Return Date',
-            selector: (row) => row.returndate,
-            export: true,
-        },
-        {
-            name: 'Time Remaining',
-            selector: (row) => row.timeRemaining,
-            export: true,
-        },
-        {
-            name: 'Action',
-            cell: (row) => (
+    const columnHelper = createMRTColumnHelper();
+    const columnsReturn = [
+        columnHelper.accessor('row', {
+        header: 'No',
+        size: 150,
+        }),
+        columnHelper.accessor('idasset', {
+        header: 'ID Asset',
+        size: 150,
+        }),
+        columnHelper.accessor('nameasset', {
+        header: 'Name',
+        size: 150,
+        }),
+        columnHelper.accessor('leasedate', {
+        header: 'Lease Date',
+        size: 150,
+        }),
+        columnHelper.accessor('returndate', {
+        header: 'Return Date',
+        size: 150,
+        }),
+        columnHelper.accessor('timeRemaining', {
+        header: 'Time Remaining',
+        size: 150,
+        }),
+        columnHelper.accessor('action', {
+            header: 'Action',
+            size: 100,
+            enableSorting: false,
+            enableColumnFilter: false,
+            Cell: ({ row }) => (
                 <div className='text-white'>
                     <input 
                     type="radio" 
                     name="selected_assets" 
                     value=""
                     onClick={() => {
-                        if (selectedLoanID.some((loan) => loan.id === row.id)) {
-                            handleRowDeselected(row);
+                        if (selectedLoanID.some((loan) => loan.id === row.original.id)) {
+                            handleRowDeselected(row.original);
                         } else {
-                            handleRowSelected(row);
+                            handleRowSelected(row.original);
                         }
                     }} />
                 </div>
             ),
-        },
-        {
-            name: 'More Detail',
-            cell: (row) => (
+        }),
+        columnHelper.accessor('more', {
+            header: 'More Detail',
+            size: 100,
+            enableSorting: false,
+            enableColumnFilter: false,
+            Cell: ({ row }) => (
                 <div className='text-white flex items-center justify-center cursor-pointer'>
-                  <button className='bg-gray-800 p-1 rounded-lg' onClick={() => showMoreDetailHandler(row)}>
-                    <FontAwesomeIcon icon={faCircleInfo} size='xl'/>
-                  </button>
+                    <button className='bg-gray-800 py-[1px] px-3 rounded-xl' onClick={() => showMoreDetailHandler(row.original)}>
+                        <FontAwesomeIcon icon={faEllipsis} size='xl'/>
+                    </button>
                 </div>
-              ),
-            },
+            ),
+        })
     ];
+
+    const tableReturnAsset = useMaterialReactTable({
+        columns: columnsReturn,
+        data: dataWithRemainingTime || [],
+        enableFullScreenToggle: false,
+        positionToolbarAlertBanner: 'none',
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
+            },
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
+            },
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+            borderRadius: '0',
+            border: '1px solid #ffffff',
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+            '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+            },
+            },
+        },
+        muiTopToolbarProps: {
+            sx: {
+            backgroundColor: '#1f2937',
+            },
+        },
+        muiBottomToolbarProps: {
+            sx: {
+                backgroundColor: '#1f2937',
+            },
+        },
+        muiTableHeadCellProps: {
+            sx: {
+            fontWeight: 'bold',
+            fontSize: '14px',
+            },
+        },
+        muiSearchTextFieldProps: {
+        size: 'small',
+        variant: 'outlined',
+        },
+        paginationDisplayMode: 'pages',
+        muiPaginationProps: {
+            color: 'standard',
+            rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+            pageSize: 5,
+            shape: 'rounded',
+            variant: 'outlined',
+        },
+    });
+
+    const columnMore = [
+        columnHelper.accessor('idasset', {
+            header: 'ID Asset',
+            size: 150,
+        }),
+        columnHelper.accessor('nameasset', {
+            header: 'Name',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsdesc', {
+            header: 'Description',
+            size: 250,
+        }),
+        columnHelper.accessor('assetsbrand', {
+            header: 'Brand',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsmodel', {
+            header: 'Model',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsstatus', {
+            header: 'Status',
+            size: 150,
+        }),
+        columnHelper.accessor('assetslocation', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('assetscategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('assetssn', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        columnHelper.accessor('image_path', {
+            header: 'Photo',
+            size: 100,
+            Cell: ({ row }) => (
+                <div className='cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-105'>
+                    <img src={row.original.assetsphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
+                </div>
+            ),
+        }),
+        ];
+
+    const tableMore = useMaterialReactTable({
+        columns: columnMore,
+        data: selectedAssetDetails || [],
+        enableTopToolbar: false,
+        enableBottomToolbar: false,
+        enableColumnActions: false,
+        enableSorting: false,
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
+            },
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
+            },
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+                borderRadius: '0',
+                border: '1px solid #ffffff',
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+                '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+                },
+            },
+        },
+    });
 
     return (
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di Return page :)</h2>
+                    <h2 className='text-white'>Welcome, Return page :)</h2>
                 </div>
-            </div>
-            <div className='p-2'>
                 <div className='p-2 bg-white'>
                     <div className='p-3 flex gap-1'>
                         <div className='flex gap-1'>
@@ -264,6 +349,21 @@ const Return = () => {
                         </div>   
                     </div>
                 </div>
+                <div className='mt-1'>
+                    <MaterialReactTable 
+                        table={tableReturnAsset}
+                    />
+                </div>
+                <div className='flex justify-end'>
+                    <Button
+                        className='bg-gray-800'
+                        type='submit'
+                        onClick={() => handleReturnAsset(token, selectedLoanID)}
+                        disabled={isLoading} 
+                    >
+                        {isLoading ? 'Returning...' : 'Return'}
+                    </Button>
+                </div>
             </div>
 
             {isDesktopView && (
@@ -271,18 +371,16 @@ const Return = () => {
                     isOpen={showModalAsset}
                     onRequestClose={closeModalAssetHandle}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                     className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset</h1>
-                            <DataTable
-                                columns={morecolumn}
-                                data={selectedAssetDetails}
-                                highlightOnHover
-                            />
-                        <Button onClick={closeModalAssetHandle} className=" mt-4">
+                        <h1>The following is a complete of Asset detail.</h1>
+                        <MaterialReactTable 
+                            table={tableMore}
+                        />
+                        <Button onClick={closeModalAssetHandle} className="bg-gray-800 mt-4">
                             Close
                         </Button>
                     </div>
@@ -293,45 +391,21 @@ const Return = () => {
                     isOpen={showModalAsset}
                     onRequestClose={closeModalAssetHandle}
                     contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                    overlayClassName="fixed z-10 inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                     className='modal-content bg-transparent p-4 w-screen'
                     shouldCloseOnOverlayClick={false}
                     >
                     <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset</h1>
-                            <DataTable
-                                columns={morecolumn}
-                                data={selectedAssetDetails}
-                                highlightOnHover
-                            />
-                        <Button onClick={closeModalAssetHandle} className=" mt-4">
+                        <h1>The following is a complete of Asset detail.</h1>
+                        <MaterialReactTable 
+                            table={tableMore}
+                        />
+                        <Button onClick={closeModalAssetHandle} className="bg-gray-800 mt-4">
                             Close
                         </Button>
                     </div>
                 </Modal>
             )}
-
-            <div className='p-2'>
-                <DataTable
-                    columns={columns}
-                    data={dataWithRemainingTime}
-                    noHeader
-                    defaultSortField='id'
-                    defaultSortAsc={false}
-                    pagination
-                    highlightOnHover
-                />
-            </div>
-            <div className='flex justify-end p-2'>
-                <Button
-                    className=''
-                    type='submit'
-                    onClick={() => handleReturnAsset(token, selectedLoanID)}
-                    disabled={isLoading} 
-                >
-                    {isLoading ? 'Returning...' : 'Return'}
-                </Button>
-            </div>
         </>
     )
 };

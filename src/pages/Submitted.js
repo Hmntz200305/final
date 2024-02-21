@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import DataTable from 'react-data-table-component';
-import 'react-data-table-component-extensions/dist/index.css';
+import { MaterialReactTable, useMaterialReactTable, createMRTColumnHelper } from 'material-react-table';
 import { faCheck, faCircleInfo, faEllipsis, faXmark, } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuth } from '../AuthContext';
@@ -13,18 +12,135 @@ const Submitted = () => {
 
     const LeaseContent = () => {
 
+      const columnLease = [
+        columnHelper.accessor('idticket', {
+          header: 'No Ticket',
+          size: 150,
+        }),
+        columnHelper.accessor('assets', {
+          header: 'ID Asset',
+          size: 150,
+        }),
+        columnHelper.accessor('name', {
+          header: 'Pengaju',
+          size: 150,
+        }),
+        columnHelper.accessor('leasedate', {
+          header: 'Lease Date',
+          size: 150,
+        }),
+        columnHelper.accessor('returndate', {
+          header: 'Return Date',
+        }),
+        columnHelper.accessor('location', {
+          header: 'Location',
+          size: 150,
+          filterVariant: 'select',
+          filterSelectOptions: ListLocation,
+        }),
+        columnHelper.accessor('email', {
+          header: 'Email',
+          size: 150,
+        }),
+        columnHelper.accessor('note', {
+          header: 'Note',
+          size: 150,
+        }),
+        columnHelper.accessor('action', {
+          header: 'Action',
+          size: 100,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white'>
+                <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openApproveLease(row.original.idticketadmin, row.original.idticket, row.original.name)}>
+                    <FontAwesomeIcon icon={faCheck} />
+                </button>
+                <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openDeclineLease(row.original.idticket, row.original.name)}>
+                    <FontAwesomeIcon icon={faXmark} />
+                </button>
+            </div>
+          ),
+        }),
+        columnHelper.accessor('more', {
+          header: 'More Detail',
+          size: 100,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white flex items-center justify-center cursor-pointer'>
+              <button className='bg-gray-800 py-[1px] px-3 rounded-xl' onClick={() => showMoreDetailLease(row.original)}>
+                <FontAwesomeIcon icon={faEllipsis} size='xl'/>
+              </button>
+            </div>
+          ),
+        })
+      ];
+
+      const tableLease = useMaterialReactTable({
+        columns: columnLease,
+        data: SubmitedList.ticket_list || [],
+        enableFullScreenToggle: false,
+        positionToolbarAlertBanner: 'none',
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
+            },
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
+            },
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+              borderRadius: '0',
+              border: '1px solid #ffffff',
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+              '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+              },
+            },
+        },
+        muiTopToolbarProps: {
+            sx: {
+              backgroundColor: '#1f2937',
+            },
+        },
+        muiBottomToolbarProps: {
+            sx: {
+                backgroundColor: '#1f2937',
+            },
+        },
+        muiTableHeadCellProps: {
+            sx: {
+              fontWeight: 'bold',
+              fontSize: '14px',
+            },
+        },
+        muiSearchTextFieldProps: {
+          size: 'small',
+          variant: 'outlined',
+        },
+        paginationDisplayMode: 'pages',
+        muiPaginationProps: {
+            color: 'standard',
+            rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+            pageSize: 5,
+            shape: 'rounded',
+            variant: 'outlined',
+        },
+      });
+
       return (
         <>
           <div className='p-2 bg-white z-0 static'>
-            <DataTable 
-              className='static z-0'
-              columns={columnLease}
-              data={SubmitedList.ticket_list}
-              noHeader
-              defaultSortField='no'
-              defaultSortAsc={false}
-              pagination
-              highlightOnHover
+            <MaterialReactTable
+              table={tableLease}
             />
           </div>
         </>
@@ -33,25 +149,138 @@ const Submitted = () => {
 
     const ReturnContent = () => {
 
+      const columnReturn = [
+        columnHelper.accessor('idticket', {
+          header: 'No Ticket',
+          size: 150,
+        }),
+        columnHelper.accessor('assets', {
+          header: 'ID Asset',
+          size: 150,
+        }),
+        columnHelper.accessor('name', {
+          header: 'Pengaju',
+          size: 150,
+        }),
+        columnHelper.accessor('leasedate', {
+          header: 'Lease Date',
+          size: 150,
+        }),
+        columnHelper.accessor('returndate', {
+          header: 'Return Date',
+        }),
+        columnHelper.accessor('assetlocation', {
+          header: 'Location',
+          size: 150,
+          filterVariant: 'select',
+          filterSelectOptions: ListLocation,
+        }),
+        columnHelper.accessor('email', {
+          header: 'Email',
+          size: 150,
+        }),
+        columnHelper.accessor('action', {
+          header: 'Action',
+          size: 100,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white'>
+                <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openApproveReturn(row.original.idticket, row.original.name)}>
+                    <FontAwesomeIcon icon={faCheck} />
+                </button>
+                <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openDeclineReturn(row.original.idticket, row.original.name)}>
+                    <FontAwesomeIcon icon={faXmark} />
+                </button>
+            </div>
+          ),
+        }),
+        columnHelper.accessor('more', {
+          header: 'More Detail',
+          size: 100,
+          enableSorting: false,
+          enableColumnFilter: false,
+          Cell: ({ row }) => (
+            <div className='text-white flex items-center justify-center cursor-pointer'>
+              <button className='bg-gray-800 py-[1px] px-3 rounded-xl' onClick={() => showMoreDetailLease(row.original)}>
+                <FontAwesomeIcon icon={faEllipsis} size='xl'/>
+              </button>
+            </div>
+          ),
+        })
+      ];
+
+      const tableReturn = useMaterialReactTable({
+        columns: columnReturn,
+        data: ReturnSubmitedList.ticket_list || [],
+        enableFullScreenToggle: false,
+        positionToolbarAlertBanner: 'none',
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
+            },
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
+            },
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+              borderRadius: '0',
+              border: '1px solid #ffffff',
+            },
+        },
+        muiTableBodyProps: {
+            sx: {
+              '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+              },
+            },
+        },
+        muiTopToolbarProps: {
+            sx: {
+              backgroundColor: '#1f2937',
+            },
+        },
+        muiBottomToolbarProps: {
+            sx: {
+                backgroundColor: '#1f2937',
+            },
+        },
+        muiTableHeadCellProps: {
+            sx: {
+              fontWeight: 'bold',
+              fontSize: '14px',
+            },
+        },
+        muiSearchTextFieldProps: {
+          size: 'small',
+          variant: 'outlined',
+        },
+        paginationDisplayMode: 'pages',
+        muiPaginationProps: {
+            color: 'standard',
+            rowsPerPageOptions: [2, 5, 10, 20, 50, 100],
+            pageSize: 5,
+            shape: 'rounded',
+            variant: 'outlined',
+        },
+      });
+
       return (
         <>
           <div className='p-2 bg-white z-0 static'>
-            <DataTable 
-              className='z-0 static'
-              columns={columnReturn}
-              data={ReturnSubmitedList.ticket_list}
-              noHeader
-              defaultSortField='no'
-              defaultSortAsc={false}
-              pagination
-              highlightOnHover
+            <MaterialReactTable
+              table={tableReturn}
             />
           </div>
         </>
       )
     }
 
-    const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar, refreshReturnSubmitedList, ReturnSubmitedList } = useAuth();
+    const { token, Role, SubmitedList, refreshSubmitedList, setNotification, setNotificationStatus, setNotificationInfo, openSidebar, setOpenSidebar, refreshReturnSubmitedList, ReturnSubmitedList, ListLocation, refreshListLocation } = useAuth();
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [selectedTicketSenderName, setSelectedTicketSenderName] = useState(null);
     const [SelectedTicketingAdmin, setSelectedTicketingAdmin] = useState(null);
@@ -66,6 +295,11 @@ const Submitted = () => {
     const [declineLease, setDeclineLease] = useState(false);
     const [approveReturn, setApproveReturn] = useState(false);
     const [declineReturn, setDeclineReturn] = useState(false);
+    const columnHelper = createMRTColumnHelper();
+
+    useEffect(() => {
+      refreshListLocation();
+    }, []);
 
     const openApproveLease = (idticketadmin, idticket, name) => {
       setSelectedTicketId(idticket);
@@ -315,221 +549,203 @@ const Submitted = () => {
       }
     };
     
-    const moreLease = [
-      {
-          name: 'ID Asset',
-          selector: (row) => row.assets,
-          },
-          {
-          name: 'Name',
-          selector: (row) => row.assetname,
-          },
-          {
-          name: 'Description',
-          selector: (row) => row.assetdesc,
-          },
-          {
-          name: 'Brand',
-          selector: (row) => row.assetbrand,
-          },
-          {
-          name: 'Model',
-          selector: (row) => row.assetmodel,
-          },
-          {
-          name: 'Status',
-          selector: (row) => row.assetstatus,
-          },
-          {
-          name: 'Location',
-          selector: (row) => row.location,
-          },
-          {
-          name: 'Category',
-          selector: (row) => row.assetcategory,
-          },
-          {
-          name: 'SN',
-          selector: (row) => row.assetsn,
-          },
-          {
-          name: 'Photo',
-          cell: (row) => (
+    const columnMoreLease = [
+        columnHelper.accessor('assets', {
+            header: 'ID Asset',
+            size: 150,
+        }),
+        columnHelper.accessor('assetname', {
+            header: 'Name',
+            size: 150,
+        }),
+        columnHelper.accessor('assetdesc', {
+            header: 'Description',
+            size: 250,
+        }),
+        columnHelper.accessor('assetbrand', {
+            header: 'Brand',
+            size: 150,
+        }),
+        columnHelper.accessor('assetmodel', {
+            header: 'Model',
+            size: 150,
+        }),
+        columnHelper.accessor('assetstatus', {
+            header: 'Status',
+            size: 150,
+        }),
+        columnHelper.accessor('location', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('assetcategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsn', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        columnHelper.accessor('image_path', {
+            header: 'Photo',
+            size: 100,
+            Cell: ({ row }) => (
               <div>
-                <img src={row.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
+                <img src={row.original.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
               </div>
             ),
-          },
-  ]
+        }),
+        ];
 
-    const columnLease = [
-        {
-            name: 'No Ticket',
-            selector: (row) => row.idticket,
+    const tableMoreLease = useMaterialReactTable({
+        columns: columnMoreLease,
+        data: selectedAssetDetails || [],
+        enableTopToolbar: false,
+        enableBottomToolbar: false,
+        enableColumnActions: false,
+        enableSorting: false,
+        displayColumnDefOptions: {
+            'mrt-row-select': {
+                size: 20,
+                grow: false,
             },
-            {
-            name: 'ID Asset',
-            selector: (row) => row.assets,
+            'mrt-row-numbers': {
+                size: 20,
+                grow: true,
             },
-            {
-            name: 'Pengaju',
-            selector: (row) => row.name,
+        },
+        muiTablePaperProps: {
+            elevation: 0,
+            sx: {
+                borderRadius: '0',
+                border: '1px solid #ffffff',
             },
-            {
-            name: 'CheckOut Date',
-            selector: (row) => row.leasedate,
+        },
+        muiTableBodyProps: {
+            sx: {
+                '& tr:nth-of-type(odd) > td': {
+                backgroundColor: '#f5f5f5',
+                },
             },
-            {
-            name: 'CheckIn Date',
-            selector: (row) => row.returndate,
-            },
-            {
-            name: 'Lokasi',
-            selector: (row) => row.location,
-            },
-            {
-            name: 'Email',
-            selector: (row) => row.email,
-            },
-            {
-            name: 'Note',
-            selector: (row) => row.note,
-            },
-            {
-            name: 'Action',
-            cell: (row) => (
-                <div className='text-white'>
-                    <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openApproveLease(row.idticketadmin, row.idticket, row.name)}>
-                        <FontAwesomeIcon icon={faCheck} />
-                    </button>
-                    <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openDeclineLease(row.idticket, row.name)}>
-                        <FontAwesomeIcon icon={faXmark} />
-                    </button>
-                </div>
-                )
-            },
-            {
-              name: 'More Detail',
-              cell: (row) => (
-                  <div className='text-white flex items-center justify-center cursor-pointer'>
-                    <button className='bg-gray-800 py-1 px-4 rounded rounded-full' onClick={() => showMoreDetailLease(row)}>
-                      <FontAwesomeIcon icon={faEllipsis} size='xl'/>
-                    </button>
-                  </div>
-                ),
-              },
-    ]
+        },
+    });
 
-    const moreReturn = [
-      {
-          name: 'ID Asset',
-          selector: (row) => row.assets,
-          },
-          {
-          name: 'Name',
-          selector: (row) => row.assetname,
-          },
-          {
-          name: 'Description',
-          selector: (row) => row.assetdesc,
-          },
-          {
-          name: 'Brand',
-          selector: (row) => row.assetbrand,
-          },
-          {
-          name: 'Model',
-          selector: (row) => row.assetmodel,
-          },
-          {
-          name: 'Status',
-          selector: (row) => row.assetstatus,
-          },
-          {
-          name: 'Location',
-          selector: (row) => row.assetlocation,
-          },
-          {
-          name: 'Category',
-          selector: (row) => row.assetcategory,
-          },
-          {
-          name: 'SN',
-          selector: (row) => row.assetsn,
-          },
-          {
-          name: 'Photo',
-          cell: (row) => (
+    const columnMoreReturn = [
+        columnHelper.accessor('assets', {
+            header: 'ID Asset',
+            size: 150,
+        }),
+        columnHelper.accessor('assetname', {
+            header: 'Name',
+            size: 150,
+        }),
+        columnHelper.accessor('assetdesc', {
+            header: 'Description',
+            size: 250,
+        }),
+        columnHelper.accessor('assetbrand', {
+            header: 'Brand',
+            size: 150,
+        }),
+        columnHelper.accessor('assetmodel', {
+            header: 'Model',
+            size: 150,
+        }),
+        columnHelper.accessor('assetstatus', {
+            header: 'Status',
+            size: 150,
+        }),
+        columnHelper.accessor('assetlocation', {
+            header: 'Location',
+            size: 150,
+        }),
+        columnHelper.accessor('assetcategory', {
+            header: 'Category',
+            size: 150,
+        }),
+        columnHelper.accessor('assetsn', {
+            header: 'Serial Number',
+            size: 150,
+        }),
+        columnHelper.accessor('image_path', {
+            header: 'Photo',
+            size: 100,
+            Cell: ({ row }) => (
               <div>
-                <img src={row.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
+                <img src={row.original.assetphoto} alt="Asset" className='rounded-lg shadow p-0.5 shadow-black' />
               </div>
             ),
-          },
-    ]
+        }),
+        ];
 
-    const columnReturn = [
-        {
-            name: 'No Ticket',
-            selector: (row) => row.idticket,
-            },
-            {
-            name: 'ID Asset',
-            selector: (row) => row.assets,
-            },
-            {
-            name: 'Pengaju',
-            selector: (row) => row.name,
-            },
-            {
-            name: 'CheckOut Date',
-            selector: (row) => row.leasedate,
-            },
-            {
-            name: 'CheckIn Date',
-            selector: (row) => row.returndate,
-            },
-            {
-            name: 'Lokasi',
-            selector: (row) => row.assetlocation,
-            },
-            {
-            name: 'Email',
-            selector: (row) => row.email,
-            },
-            {
-            name: 'Action',
-            cell: (row) => (
-                <div className='text-white'>
-                    <button className='bg-green-500 p-2 rounded-lg hover:bg-green-700 m-0.5' onClick={() => openApproveReturn(row.idticket, row.name)}>
-                        <FontAwesomeIcon icon={faCheck} />
-                    </button>
-                    <button className='bg-red-500 p-2 rounded-lg hover:bg-red-700 m-0.5' onClick={() => openDeclineReturn(row.idticket, row.name)}>
-                        <FontAwesomeIcon icon={faXmark} />
-                    </button>
-                </div>
-                )
-            },
-            {
-              name: 'More Detail',
-              cell: (row) => (
-                  <div className='text-white flex items-center justify-center cursor-pointer'>
-                    <button className='bg-gray-800 py-1 px-4 rounded rounded-full' onClick={() => showMoreDetailReturn(row)}>
-                      <FontAwesomeIcon icon={faEllipsis} size='xl'/>
-                    </button>
-                  </div>
-                ),
+      const tableMoreReturn = useMaterialReactTable({
+          columns: columnMoreReturn,
+          data: selectedAssetDetails || [],
+          enableTopToolbar: false,
+          enableBottomToolbar: false,
+          enableColumnActions: false,
+          enableSorting: false,
+          displayColumnDefOptions: {
+              'mrt-row-select': {
+                  size: 20,
+                  grow: false,
               },
-      ]
+              'mrt-row-numbers': {
+                  size: 20,
+                  grow: true,
+              },
+          },
+          muiTablePaperProps: {
+              elevation: 0,
+              sx: {
+                  borderRadius: '0',
+                  border: '1px solid #ffffff',
+              },
+          },
+          muiTableBodyProps: {
+              sx: {
+                  '& tr:nth-of-type(odd) > td': {
+                  backgroundColor: '#f5f5f5',
+                  },
+              },
+          },
+      });
 
       const [activeTab, setActiveTab] = useState("lease");
       const data = [
       {
-          label: "Lease",
+          label: SubmitedList.total_records ? (
+            <div className='flex gap-2 items-center justify-center'>
+                <div>
+                    <p>
+                        Lease
+                    </p>
+                </div>
+                <div className='flex items-center mb-4'>
+                    <Badge />
+                </div>
+            </div>
+          ) : (
+            <>Lease</>
+          ),
           value: "lease",
           content: <LeaseContent />,
       },
       {
-          label: "Return",
+          label: ReturnSubmitedList.total_records ? (
+            <div className='flex gap-2 items-center justify-center'>
+                <div>
+                    <p>
+                        Return
+                    </p>
+                </div>
+                <div className='flex items-center mb-4'>
+                    <Badge />
+                </div>
+            </div>
+          ) : (
+            <>Return</>
+          ),
           value: "return",
           content: <ReturnContent />,
       },
@@ -538,15 +754,15 @@ const Submitted = () => {
     return (
         <>
             <div className='p-2'>
-                <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di Submitted page :)</h2>
+                <div className='bg-gray-800 mb-8 rounded-2xl p-4 shadow'>
+                    <h2 className='text-white'>Welcome, Submitted page :)</h2>
                 </div>
             </div>
 
             <div className='p-2'>
               <div className='bg-white rounded'>
                   <div className='flex justify-center'>
-                      <h1 className="text-2xl font-semibold mt-6">Select Action</h1>
+                      <h1 className="text-2xl font-semibold mt-6">Select Menu</h1>
                   </div>
                   <Tabs value={activeTab} className='p-2'>
                       <TabsHeader className="rounded-none p-0 border-b border-blue-gray-50 mt-4 bg-white"
@@ -561,13 +777,7 @@ const Submitted = () => {
                           onClick={() => setActiveTab(value)}
                           className={activeTab === value ? "text-gray-800" : "hover:text-gray-500"}
                         >
-                          {ReturnSubmitedList.total_records ? (
-                            <Badge>
-                              {label}
-                            </Badge>
-                          ) : (
-                            label
-                          )}
+                          {label}
                         </Tab>
                       ))}
                       </TabsHeader>
@@ -582,337 +792,331 @@ const Submitted = () => {
               </div>
             </div>
             
-            {/* APPROVAL LEASE */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={approveLease}
-                    onRequestClose={closeApproveLease}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveLease}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleApprove(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Approve'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={approveLease}
-                    onRequestClose={closeApproveLease}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveLease}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
+            <>
+              {/* APPROVAL LEASE */}
+              {isDesktopView && (
+                  <Modal
+                      isOpen={approveLease}
+                      onRequestClose={closeApproveLease}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure<u> want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeApproveLease}>Close</Button>
+                                  <Button 
+                                    className="bg-green-500 hover:bg-green-600 shadow-none" 
+                                    onClick={() => handleApprove(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Approve'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
+              {!isDesktopView && (
+                  <Modal
+                      isOpen={approveLease}
+                      onRequestClose={closeApproveLease}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className='modal-content bg-transparent p-4 w-screen'
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure<u> want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeApproveLease}>Close</Button>
+                                  <Button 
+                                    className="bg-green-500 hover:bg-green-600 shadow-none" 
+                                    onClick={() => handleApprove(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Decline'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
 
-            {/* DECLINE LEASE */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={declineLease}
-                    onRequestClose={closeDeclineLease}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className={`modal-content bg-transparent p-4 z-[8888] w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineLease}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={declineLease}
-                    onRequestClose={closeDeclineLease}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineLease}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDecline(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
+              {/* DECLINE LEASE */}
+              {isDesktopView && (
+                  <Modal
+                      isOpen={declineLease}
+                      onRequestClose={closeDeclineLease}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className={`modal-content bg-transparent p-4 z-[8888] w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure <u> don't want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeDeclineLease}>Close</Button>
+                                  <Button 
+                                    className="bg-red-500 hover:bg-red-600 shadow-none" 
+                                    onClick={() => handleDecline(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Decline'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
+              {!isDesktopView && (
+                  <Modal
+                      isOpen={declineLease}
+                      onRequestClose={closeDeclineLease}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className='modal-content bg-transparent p-4 w-screen'
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure <u> don't want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeDeclineLease}>Close</Button>
+                                  <Button 
+                                    className="bg-red-500 hover:bg-red-600 shadow-none" 
+                                    onClick={() => handleDecline(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Decline'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
 
-            {/* MORE DETAIL LEASE */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={showMoreAssetLease}
-                    onRequestClose={closeMoreDetailLease}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset Approval Lease</h1>
-                            <DataTable
-                                columns={moreLease}
-                                data={selectedAssetDetails}
-                                highlightOnHover
-                            />
-                        <Button onClick={closeMoreDetailLease} className="bg-red-500 hover:bg-red-600 mt-4">
-                            Close
-                        </Button>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={showMoreAssetLease}
-                    onRequestClose={closeMoreDetailLease}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset Approval Lease</h1>
-                            <DataTable
-                                columns={moreLease}
-                                data={selectedAssetDetails}
-                                highlightOnHover
-                            />
-                        <Button onClick={closeMoreDetailLease} className="bg-red-500 hover:bg-red-600 mt-4">
-                            Close
-                        </Button>
-                    </div>
-                </Modal>
-            )}
+              {/* MORE DETAIL LEASE */}
+              {isDesktopView && (
+                  <Modal
+                      isOpen={showMoreAssetLease}
+                      onRequestClose={closeMoreDetailLease}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2 py-4 bg-white'>
+                          <h1>The following is a complete of Asset detail</h1>
+                              <MaterialReactTable
+                                table={tableMoreLease}
+                              />
+                          <Button onClick={closeMoreDetailLease} className="bg-gray-800 hover:bg-gray-900 mt-4">
+                              Close
+                          </Button>
+                      </div>
+                  </Modal>
+              )}
+              {!isDesktopView && (
+                  <Modal
+                      isOpen={showMoreAssetLease}
+                      onRequestClose={closeMoreDetailLease}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className='modal-content bg-transparent p-4 w-screen'
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2 py-4 bg-white'>
+                          <h1>The following is a complete of Asset detail</h1>
+                              <MaterialReactTable
+                                table={tableMoreLease}
+                              />
+                          <Button onClick={closeMoreDetailLease} className="bg-gray-800 hover:bg-red-900 mt-4">
+                              Close
+                          </Button>
+                      </div>
+                  </Modal>
+              )}
 
-            {/* APPROVAL RETURN */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={approveReturn}
-                    onRequestClose={closeApproveReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500hamam bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleApproveReturn(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Approve'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={approveReturn}
-                    onRequestClose={closeApproveReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeApproveReturn}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleApproveReturn(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
+              {/* APPROVAL RETURN */}
+              {isDesktopView && (
+                  <Modal
+                      isOpen={approveReturn}
+                      onRequestClose={closeApproveReturn}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure<u> want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeApproveReturn}>Close</Button>
+                                  <Button 
+                                    className="bg-green-500 hover:bg-green-600 shadow-none" 
+                                    onClick={() => handleApproveReturn(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Approve'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
+              {!isDesktopView && (
+                  <Modal
+                      isOpen={approveReturn}
+                      onRequestClose={closeApproveReturn}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className='modal-content bg-transparent p-4 w-screen'
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure<u> want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeApproveReturn}>Close</Button>
+                                  <Button 
+                                    className="bg-green-500 hover:bg-green-600 shadow-none" 
+                                    onClick={() => handleApproveReturn(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Decline'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
 
-            {/* DECLINE RETURN */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={declineReturn}
-                    onRequestClose={closeDeclineReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDeclineReturn(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={declineReturn}
-                    onRequestClose={closeDeclineReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2'>
-                        <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
-                            <div className='flex flex-col text-center mb-2'>
-                                <h1 className="text-2xl font-semibold">Select Action (Decline Return)</h1>
-                                <p>Apakah anda yakin <u>Tidak ingin memberi Approval</u> untuk {selectedTicketSenderName}?</p>
-                            </div>
-                            <div className="flex space-x-4 mt-5">
-                                <Button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded" onClick={closeDeclineReturn}>Close</Button>
-                                <Button 
-                                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded" 
-                                  onClick={() => handleDeclineReturn(token)}
-                                  disabled={isLoading}
-                                >
-                                    {isLoading ? 'Proses...' : 'Decline'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-            )}
+              {/* DECLINE RETURN */}
+              {isDesktopView && (
+                  <Modal
+                      isOpen={declineReturn}
+                      onRequestClose={closeDeclineReturn}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure <u> don't want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeDeclineReturn}>Close</Button>
+                                  <Button 
+                                    className="bg-red-500 hover:bg-red-600 shadow-none" 
+                                    onClick={() => handleDeclineReturn(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Decline'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
+              {!isDesktopView && (
+                  <Modal
+                      isOpen={declineReturn}
+                      onRequestClose={closeDeclineReturn}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className='modal-content bg-transparent p-4 w-screen'
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2'>
+                          <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
+                              <div className='flex flex-col text-center mb-2'>
+                                  <h1 className="text-2xl font-semibold">Select Action</h1>
+                                  <p>Are you sure <u> don't want to Approve the Lease request</u> for {selectedTicketSenderName}?</p>
+                              </div>
+                              <div className="flex space-x-4 mt-5">
+                                  <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeDeclineReturn}>Close</Button>
+                                  <Button 
+                                    className="bg-red-500 hover:bg-red-600 shadow-none" 
+                                    onClick={() => handleDeclineReturn(token)}
+                                    disabled={isLoading}
+                                  >
+                                      {isLoading ? 'Proses...' : 'Decline'}
+                                  </Button>
+                              </div>
+                          </div>
+                      </div>
+                  </Modal>
+              )}
 
-            {/* MORE DETAIL RETURN */}
-            {isDesktopView && (
-                <Modal
-                    isOpen={showMoreAssetReturn}
-                    onRequestClose={closeMoreDetailReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset Approval Return</h1>
-                            <DataTable
-                                columns={moreReturn}
-                                data={selectedAssetDetails}
-                                highlightOnHover
-                            />
-                        <Button onClick={closeMoreDetailReturn} className="bg-red-500 hover:bg-red-600 mt-4">
-                            Close
-                        </Button>
-                    </div>
-                </Modal>
-            )}
-            {!isDesktopView && (
-                <Modal
-                    isOpen={showMoreAssetReturn}
-                    onRequestClose={closeMoreDetailReturn}
-                    contentLabel="Contoh Modal"
-                    overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
-                    className='modal-content bg-transparent p-4 w-screen'
-                    shouldCloseOnOverlayClick={false}
-                    >
-                    <div className='p-2 py-4 bg-white'>
-                        <h1>Ini adalah detail lengkap asset Approval Return</h1>
-                            <DataTable
-                                columns={moreReturn}
-                                data={selectedAssetDetails}
-                                highlightOnHover
-                            />
-                        <Button onClick={closeMoreDetailReturn} className="bg-red-500 hover:bg-red-600 mt-4">
-                            Close
-                        </Button>
-                    </div>
-                </Modal>
-            )}
+              {/* MORE DETAIL RETURN */}
+              {isDesktopView && (
+                  <Modal
+                      isOpen={showMoreAssetReturn}
+                      onRequestClose={closeMoreDetailReturn}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2 py-4 bg-white'>
+                          <h1>The following is a complete of Asset detail</h1>
+                              <MaterialReactTable
+                                    table={tableMoreReturn}
+                              />
+                          <Button onClick={closeMoreDetailReturn} className="bg-gray-800 hover:bg-red-900 mt-4">
+                              Close
+                          </Button>
+                      </div>
+                  </Modal>
+              )}
+              {!isDesktopView && (
+                  <Modal
+                      isOpen={showMoreAssetReturn}
+                      onRequestClose={closeMoreDetailReturn}
+                      contentLabel="Contoh Modal"
+                      overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[1000]"
+                      className='modal-content bg-transparent p-4 w-screen'
+                      shouldCloseOnOverlayClick={false}
+                      >
+                      <div className='p-2 py-4 bg-white'>
+                          <h1>The following is a complete of Asset detail</h1>
+                              <MaterialReactTable
+                                    table={tableMoreReturn}
+                              />
+                          <Button onClick={closeMoreDetailReturn} className="bg-gray-800 hover:bg-gray-900 mt-4">
+                              Close
+                          </Button>
+                      </div>
+                  </Modal>
+              )}
+            </>
         </>
     )
 }

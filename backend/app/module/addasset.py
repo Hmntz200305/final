@@ -95,16 +95,17 @@ class AddAsset(Resource):
                             qrcode_name = 'QRCode_' + ids + '.png'
                             img = qr.make_image(fill_color="black", back_color="white")
                             os.makedirs(save_path, exist_ok=True)
-                            img.save(os.path.join(save_path, qrcode_name))
+                            save_path_qrcode = os.path.join(current_app.config['QRCode_FOLDER'], ids)
+                            img.save(os.path.join(save_path_qrcode, qrcode_name))
 
-                            link = ('https://asset.lintasmediadanawa.com:8443' + '/static/upload/' + ids + '/' + qrcode_name)
+                            link = ('https://asset.lintasmediadanawa.com:8443' + '/static/QRCode/' + ids + '/' + qrcode_name)
                             lmd.execute("INSERT INTO assets (asset, name, description, brand, model, status, location, category, serialnumber, photo, qrcode) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (ids, nama, deskripsi, brand, model, status, lokasi, kategori, sn, image_path, link,))
                             db.commit()
                             lmd.close()
                             return {"message": "Asset successfully added with Photo", "Status": "success"}, 200
                         else:
                             image_path = (current_app.config['server_ip'] + '/static/Default/images.jfif')
-                            save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], ids)
+                            save_path = os.path.join(current_app.config['QRCode_FOLDER'], ids)
                             data_for_qrcode = {
                                 "AssetID": ids,
                                 "AssetName": nama,
@@ -132,7 +133,7 @@ class AddAsset(Resource):
                             os.makedirs(save_path, exist_ok=True)
                             img.save(os.path.join(save_path, qrcode_name))
 
-                            link = ('https://asset.lintasmediadanawa.com:8443' + '/static/upload/' + ids + '/' + qrcode_name)
+                            link = ('https://asset.lintasmediadanawa.com:8443' + '/static/QRCode/' + ids + '/' + qrcode_name)
                             lmd.execute("INSERT INTO assets (asset, name, description, brand, model, status, location, category, serialnumber, photo, qrcode) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (ids, nama, deskripsi, brand, model, status, lokasi, kategori, sn, image_path, link,))
                             db.commit()
                             lmd.close()

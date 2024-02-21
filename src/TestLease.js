@@ -243,7 +243,7 @@ const Lease = () => {
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Selamat datang di Lease page :)</h2>
+                    <h2 className='text-white'>Welcome, Lease page :)</h2>
                 </div>
             </div>
 
@@ -266,6 +266,7 @@ const Lease = () => {
                         highlightOnHover
                         onRowSelected={handleRowSelected}
                         onRowDeselected={handleRowDeselected}
+                        onRowS
                     />
                     </DataTableExtensions>
                     <div className='flex justify-end mt-5'>

@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QrScanner from 'qr-scanner';
+import { useMaterialReactTable, createMRTColumnHelper, MaterialReactTable } from 'material-react-table';
 import { Button, Select, Option, Menu, MenuList, MenuItem, MenuHandler, Input,  } from "@material-tailwind/react";
-import DataTable from 'react-data-table-component';
-import 'react-data-table-component-extensions/dist/index.css';
 import { useAuth } from '../AuthContext';
 
 const ScanLease = () => {
@@ -203,54 +202,6 @@ const ScanLease = () => {
     setShowTable(false);
   };
 
-  const Columns = [
-    {
-      name: 'ID Asset',
-      selector: row => row['AssetID'],
-      export: true
-    },
-    {
-      name: 'Name',
-      selector: row => row['AssetName'],
-      export: true
-    },
-    {
-      name: 'Description',
-      selector: row => row['AssetDesc'],
-      export: true
-    },
-    {
-      name: 'Brand',
-      selector: row => row['AssetBrand'],
-      export: true
-    },
-    {
-      name: 'Model',
-      selector: row => row['AssetModel'],
-      export: true
-    },
-    {
-      name: 'Status',
-      selector: row => row['AssetStatus'],
-      export: true
-    },
-    {
-      name: 'Location',
-      selector: row => row['AssetLocation'],
-      export: true
-    },
-    {
-      name: 'Category',
-      selector: row => row['AssetCategory'],
-      export: true
-    },
-    {
-      name: 'SN',
-      selector: row => row['AssetSN'],
-      export: true
-    },
-  ];
-
   const handleLeaseAsset = async (token) => {
     try {
       setIsLoading(true);
@@ -306,6 +257,78 @@ const ScanLease = () => {
     }
   };
 
+  const columnHelper = createMRTColumnHelper();
+  const columns = [
+    columnHelper.accessor('AssetID', {
+      header: 'ID Asset',
+      size: 150,
+    }),
+    columnHelper.accessor('AssetName', {
+      header: 'Name',
+      size: 150,
+    }),
+    columnHelper.accessor('AssetDesc', {
+      header: 'Description',
+      size: 250,
+    }),
+    columnHelper.accessor('AssetBrand', {
+      header: 'Brand',
+      size: 150,
+    }),
+    columnHelper.accessor('AssetModel', {
+      header: 'Model',
+    }),
+    columnHelper.accessor('AssetStatus', {
+      header: 'Status',
+      size: 150,
+    }),
+    columnHelper.accessor('AssetLocation', {
+      header: 'Location',
+      size: 150,
+    }),
+    columnHelper.accessor('AssetCategory', {
+      header: 'Category',
+      size: 150,
+    }),
+    columnHelper.accessor('AssetSN', {
+      header: 'Serial Number',
+      size: 150,
+    }),
+  ];
+
+const tableAsset = useMaterialReactTable({
+    columns,
+    data: scannedData || [],
+    enableTopToolbar: false,
+    enableBottomToolbar: false,
+    enableColumnActions: false,
+    enableSorting: false,
+    displayColumnDefOptions: {
+        'mrt-row-select': {
+            size: 20,
+            grow: false,
+        },
+        'mrt-row-numbers': {
+            size: 20,
+            grow: true,
+        },
+    },
+    muiTablePaperProps: {
+        elevation: 0,
+        sx: {
+            borderRadius: '0',
+            border: '1px solid #ffffff',
+        },
+    },
+    muiTableBodyProps: {
+        sx: {
+            '& tr:nth-of-type(odd) > td': {
+            backgroundColor: '#f5f5f5',
+            },
+        },
+    },
+});
+
   return (
     <>
         <div className="p-2">
@@ -315,9 +338,9 @@ const ScanLease = () => {
         </div>
         <div className='p-2'>
         {isScannerActive ? (
-          <Button onClick={handleToggleScanner}>Stop Scan</Button>
+          <Button className='bg-gray-800' onClick={handleToggleScanner}>Stop Scan</Button>
         ) : (
-          <Button onClick={handleToggleScanner}>{ShowTable ? 'Start Scan Again' : 'Start Scan'}</Button>
+          <Button className='bg-gray-800' onClick={handleToggleScanner}>{ShowTable ? 'Start Scan Again' : 'Start Scan'}</Button>
         )}
         </div>
         <div className={`${ShowTable ? 'hidden' : 'p-2 flex flex-col items-center justify-center'}`}>
@@ -335,15 +358,14 @@ const ScanLease = () => {
             <div>
               <div className='bg-white p-5 rounded-xl'>
                   <div className='flex items-center justify-between'>
-                      <h2 className=''>Berikut ini adalah Asset yang anda pinjam :</h2>
+                      <h2 className=''>The following are the details of the asset you intend to lease :</h2>
                   </div>
-                  <DataTable className='bg-[#efefef] mt-5 border-black'
-                      columns={Columns}
-                      data={scannedData || []}
+                  <MaterialReactTable
+                    table={tableAsset}
                   />
                   <div className='bg-white'>
-                      <h2 className='border-t-[1px] border-black pt-4 mt-8'>
-                          Untuk melanjutkan tranasaksi peminjaman, silahkan isi formulir dibawah ini:
+                      <h2 className='border-t-[1px] border-black pt-4 mt-8 mb-4'>
+                      To proceed with the Lease transaction, please fill out the form below:
                       </h2>
                       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                           <div className='space-y-4'>
@@ -511,7 +533,7 @@ const ScanLease = () => {
                       </div>
                       <div className='flex justify-end mt-4'>
                           <Button
-                              className=''
+                              className='bg-gray-800'
                               type='submit'
                               onClick={() => handleLeaseAsset(token)}
                               disabled={isLoading}

@@ -88,11 +88,11 @@ class ReturnAsset(Resource):
                     loandataticketid = lmd.fetchone()[0]
                     lmd.execute('SELECT email from ticketingadmin where idticket = %s', (loandataticketid,))
                     emailadmin = lmd.fetchall()
-                    message = Message(f'Pengembalian Assets', sender='nakatsuuchiha@gmail.com', recipients=[emailadmin[0][0]])
+                    message = Message(f'Pengembalian Assets', sender='admin.asset@lintasmediadanawa.com', recipients=[emailadmin[0][0]])
                     message.body = f'Ticket Number {loandataticketid}\n' \
                                    f'Atas Nama {username} ingin mengembalikan Asset {assetname}\n'
                     mail.send(message)
-                    message = Message(f'Pengembalian Assets', sender='nakatsuuchiha@gmail.com', recipients=[emailadmin[1][0]])
+                    message = Message(f'Pengembalian Assets', sender='admin.asset@lintasmediadanawa.com', recipients=[emailadmin[1][0]])
                     message.body = f'Ticket Number {loandataticketid}\n' \
                                    f'Atas Nama {username} ingin mengembalikan Asset {assetname}\n'
                     mail.send(message)
@@ -255,7 +255,7 @@ class ReturnApprove(Resource):
                         db.commit()
                         lmd.close()
                         db.close()          
-                        message = Message(f'Pengembalian Assets', sender='nakatsuuchiha@gmail.com', recipients=[email])
+                        message = Message(f'Pengembalian Assets', sender='admin.asset@lintasmediadanawa.com', recipients=[email])
                         message.body = f'Ticket Number {TicketID}\n' \
                                        f'Admin Atas Nama {admin} telah mengizinkan pengembalian Asset {nameasset}\n'
                         mail.send(message)
@@ -295,7 +295,7 @@ class ReturnDecline(Resource):
                         db.commit()
                         lmd.close()
                         db.close()          
-                        message = Message(f'Penolakan Pengembalian Assets', sender='nakatsuuchiha@gmail.com', recipients=[email])
+                        message = Message(f'Penolakan Pengembalian Assets', sender='admin.asset@lintasmediadanawa.com', recipients=[email])
                         message.body = f'Ticket Number {TicketID}\n' \
                                        f'Admin Atas Nama {admin} tidak mengizinkan pengembalian Asset {nameasset}\n'
                         mail.send(message)
