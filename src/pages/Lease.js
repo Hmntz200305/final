@@ -373,7 +373,7 @@ const Lease = () => {
         <>
             <div className='p-2'>
                 <div className='bg-gray-800 mb-8 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Welcome, Lease page hais:)</h2>
+                    <h2 className='text-white'>Welcome, Lease page:)</h2>
                 </div>
                 {showTable && (
                     <div>

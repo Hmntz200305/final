@@ -279,7 +279,7 @@ const Login = () => {
                   <div className="flex flex-col items-center justify-center bg p-2 shadow-xl rounded-2xl gap-2 bg-white">
                       <div className='flex flex-col text-center mb-8 px-8'>
                           <h1 className="text-2xl font-semibold">Forgot Password</h1>
-                          <p className='mt-2'>Silahkan lakukan Validasi Data, kemudian inputkan Password anda yang baru</p>
+                          <p className='mt-2'>Please validate the data on Username and Email Form, then input your new Password.</p>
                       </div>
                       <hr className="border-t-2 border-gray-300 w-32" />
                       <div className="text-xs text-gray-500 mb-2">Validasi User</div>
@@ -337,8 +337,8 @@ const Login = () => {
                           </div>
                       </div>
                       <div className="flex space-x-4 mt-5 mb-2">
-                          <Button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeModalHandler}>Cancel</Button>
-                          <Button className="main-btn hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" type='submit' onClick={handleForgotPassword}>Submit</Button>
+                          <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeModalHandler}>Cancel</Button>
+                          <Button className="bg-gray-800 hover:bg-gray-900 shadow-none" type='submit' onClick={handleForgotPassword}>Submit</Button>
                       </div>
                   </div>
               </div>

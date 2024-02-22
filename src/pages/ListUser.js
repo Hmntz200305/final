@@ -255,7 +255,7 @@ const ListUser = () => {
         <> 
             <div className='p-2'>
                 <div className='bg-gray-800 mb-5 rounded-2xl p-4 shadow'>
-                    <h2 className='text-white'>Welcome, List of User hehe :)</h2>
+                    <h2 className='text-white'>Welcome, List of User :)</h2>
                 </div>
             </div>
 
@@ -265,7 +265,7 @@ const ListUser = () => {
                         isOpen={modalDelete}
                         onRequestClose={closeModalDelete}
                         contentLabel="Contoh Modal"
-                        overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                        overlayClassName="z-10 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                         className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                         shouldCloseOnOverlayClick={false}
                     >
@@ -273,11 +273,11 @@ const ListUser = () => {
                             <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
                                 <div className='flex flex-col text-center mb-2'>
                                     <h1 className="text-2xl font-semibold">Select Action</h1>
-                                    <p>Apakah anda yakin ingin menghapus User ini?</p>
+                                    <p>Are you sure want to Delete this User?</p>
                                 </div>
                                 <div className="flex space-x-4 mt-5">
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeModalDelete}>Cancel</Button>
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => deleteUser(selectedUserId)}>Delete</Button>
+                                    <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeModalDelete}>Cancel</Button>
+                                    <Button className="bg-red-500 hover:bg-red-600 shadow-none" onClick={() => deleteUser(selectedUserId)}>Delete</Button>
                                 </div>
                             </div>
                         </div>
@@ -288,7 +288,7 @@ const ListUser = () => {
                         isOpen={modalDelete}
                         onRequestClose={closeModalDelete}
                         contentLabel="Contoh Modal"
-                        overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                        overlayClassName="z-10 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                         className='modal-content bg-transparent p-4 w-screen'
                         shouldCloseOnOverlayClick={false}
                     >
@@ -296,11 +296,11 @@ const ListUser = () => {
                             <div className="flex flex-col items-center justify-center bg-white p-2 shadow-xl rounded-2xl">
                                 <div className='flex flex-col text-center mb-2'>
                                     <h1 className="text-2xl font-semibold">Select Action</h1>
-                                    <p>Apakah anda yakin ingin menghapus User ini?</p>
+                                    <p>Are you sure want to Delete this User?</p>
                                 </div>
                                 <div className="flex space-x-4 mt-5">
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeModalDelete}>Cancel</Button>
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => deleteUser(selectedUserId)}>Delete</Button>
+                                    <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeModalDelete}>Cancel</Button>
+                                    <Button className="bg-red-500 hover:bg-red-600 shadow-none" onClick={() => deleteUser(selectedUserId)}>Delete</Button>
                                 </div>
                             </div>
                         </div>
@@ -312,7 +312,7 @@ const ListUser = () => {
                         isOpen={modalEdit}
                         onRequestClose={closeModalEdit}
                         contentLabel="Contoh Modal"
-                        overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                        overlayClassName="z-10 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                         className={`modal-content bg-transparent p-4 w-screen ${openSidebar ? ' pl-[315px]' : ''}`}
                         shouldCloseOnOverlayClick={false} 
                     >
@@ -320,7 +320,7 @@ const ListUser = () => {
                             <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl space-y-4">
                                 <div className='flex flex-col text-center mb-2'>
                                     <h1 className="text-2xl font-semibold">Select Action</h1>
-                                    <p>Silahkan inputkan data User yang baru</p>
+                                    <p>Please input new user data.</p>
                                 </div>
                                 <div className='flex items-center gap-4 relative'>
                                     <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Username</label>
@@ -390,8 +390,8 @@ const ListUser = () => {
                                     </div>
                                 </div>
                                 <div className="flex justify-center space-x-4 mt-5 mb-2">
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeModalEdit}>Cancel</Button>
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => editUser(token)}>Submit</Button>
+                                    <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeModalEdit}>Cancel</Button>
+                                    <Button className="bg-green-500 hover:bg-green-600 shadow-none" onClick={() => editUser(token)}>Submit</Button>
                                 </div>
                             </div>
                         </div>
@@ -402,7 +402,7 @@ const ListUser = () => {
                         isOpen={modalEdit}
                         onRequestClose={closeModalEdit}
                         contentLabel="Contoh Modal"
-                        overlayClassName="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                        overlayClassName="z-10 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                         className='modal-content bg-transparent p-4 w-screen'
                         shouldCloseOnOverlayClick={false} 
                     >
@@ -410,7 +410,7 @@ const ListUser = () => {
                             <div className="flex flex-col bg-white p-2 shadow-xl rounded-2xl space-y-4">
                                 <div className='flex flex-col text-center mb-2'>
                                     <h1 className="text-2xl font-semibold">Select Action</h1>
-                                    <p>Silahkan inputkan data User yang baru</p>
+                                    <p>Please input new user data.</p>
                                 </div>
                                 <div className='flex items-center gap-4 relative'>
                                     <label className={`pr-4 w-32 text-right ${isMobile ? 'hidden lg:inline' : ''}`}>Username</label>
@@ -480,8 +480,8 @@ const ListUser = () => {
                                     </div>
                                 </div>
                                 <div className="flex justify-center space-x-4 mt-5 mb-2">
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={closeModalEdit}>Cancel</Button>
-                                    <Button className=" hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded" onClick={() => editUser(token)}>Submit</Button>
+                                    <Button className="border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-200 shadow-none" onClick={closeModalEdit}>Cancel</Button>
+                                    <Button className="bg-green-500 hover:bg-green-600 shadow-none" onClick={() => editUser(token)}>Submit</Button>
                                 </div>
                             </div>
                         </div>
